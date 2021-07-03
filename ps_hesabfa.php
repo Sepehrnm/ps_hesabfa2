@@ -28,6 +28,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/LogService.php');
+include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/ProductService.php');
+include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/SettingService.php');
+
+use hesabfa\services\LogService;
+use hesabfa\services\ProductService;
+
 class Ps_hesabfa extends Module
 {
     protected $config_form = false;
@@ -65,10 +72,12 @@ class Ps_hesabfa extends Module
 
         include(dirname(__FILE__).'/sql/install.php');
 
+        $settingService = new SettingService();
+        $settingService->setDefaultSettings();
+
         return parent::install() &&
             $this->registerHook('header') &&
             $this->registerHook('backOfficeHeader') &&
-            $this->registerHook('actionProductAdd') &&
             $this->registerHook('actionProductDelete') &&
             $this->registerHook('actionProductUpdate') &&
             $this->createTabLink();
@@ -76,7 +85,8 @@ class Ps_hesabfa extends Module
 
     public function uninstall()
     {
-        Configuration::deleteByName('PS_HESABFA_LIVE_MODE');
+        $settingService = new SettingService();
+        $settingService->deleteAllSettings();
 
         include(dirname(__FILE__).'/sql/uninstall.php');
 
@@ -231,9 +241,11 @@ class Ps_hesabfa extends Module
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
 
-    public function hookActionProductAdd()
+    public function hookActionProductAdd($params)
     {
-        /* Place your code here. */
+        $logService = new LogService();
+        $logService->writeLogStr("product add hook called!");
+        $logService->writeLogObj($params);
     }
 
     public function hookActionProductDelete()
@@ -241,8 +253,29 @@ class Ps_hesabfa extends Module
         /* Place your code here. */
     }
 
-    public function hookActionProductUpdate()
+    private $hookProductUpdateCalled = false;
+    public function hookActionProductUpdate($params)
     {
-        /* Place your code here. */
+        if($this->hookProductUpdateCalled)
+            return;
+        $this->hookProductUpdateCalled = true;
+
+        $product = new Product($params["id_product"]);
+
+        $productService = new ProductService();
+
+
+
+        $logService = new LogService();
+        $logService->writeLogStr("product update hook called!");
+        $logService->writeLogStr('id:' . $params["id_product"]);
+        $logService->writeLogStr('tax_rate:' . $params["product"]->tax_rate);
+        $logService->writeLogStr('name:' . $params["product"]->name[1]);
+        $logService->writeLogStr('quantity:' . $params["product"]->quantity);
+
+//        $logService->writeLogObj($params["product"]);
+        $productQuantity = StockAvailable::getQuantityAvailableByProduct($params["id_product"]);
+        $logService->writeLogStr("product quantity: $productQuantity");
+        //$logService->writeLogObj();
     }
 }

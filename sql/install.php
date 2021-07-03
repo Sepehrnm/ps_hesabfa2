@@ -25,10 +25,23 @@
 */
 $sql = array();
 
+// create new table
+
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ps_hesabfa` (
-    `id_ps_hesabfa` int(11) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY  (`id_ps_hesabfa`)
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `obj_type` varchar(32) NOT NULL,
+    `id_hesabfa` int(11) UNSIGNED NOT NULL,
+    `id_ps` int(11) UNSIGNED NOT NULL,
+    `id_ps_attribute` INT(10) NOT NULL DEFAULT 0,
+    PRIMARY KEY  (`id`)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
+// copy data from previous plugin table
+
+$sql[] = 'INSERT INTO `' . _DB_PREFIX_ . 'ps_hesabfa`
+    (obj_type,id_hesabfa,id_ps,id_ps_attribute) 
+    SELECT obj_type,id_hesabfa,id_ps,id_ps_attribute
+    FROM `' . _DB_PREFIX_ . 'ssb_hesabfa`';
 
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {

@@ -1,5 +1,7 @@
 <?php
 
+include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/LogService.php');
+use hesabfa\services\LogService;
 
 class AdminOriginController extends ModuleAdminController
 {
@@ -11,6 +13,9 @@ class AdminOriginController extends ModuleAdminController
     public function init() {
         parent::init();
         $this->bootstrap = true;
+
+        $logService = new LogService();
+        $logService->writeLogStr("test");
     }
 
     public function initContent() {
