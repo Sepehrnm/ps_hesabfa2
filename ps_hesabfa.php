@@ -31,6 +31,7 @@ if (!defined('_PS_VERSION_')) {
 include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/LogService.php');
 include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/ProductService.php');
 include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/SettingService.php');
+include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/HesabfaApiService.php');
 
 use hesabfa\services\LogService;
 use hesabfa\services\ProductService;
@@ -203,9 +204,11 @@ class Ps_hesabfa extends Module
      */
     protected function getConfigFormValues()
     {
+        $settingService = new SettingService();
+
         return array(
-            'PS_HESABFA_API_KEY' => Configuration::get('PS_HESABFA_API_KEY', null),
-            'PS_HESABFA_API_TOKEN' => Configuration::get('PS_HESABFA_API_TOKEN', null),
+            'PS_HESABFA_API_KEY' => $settingService->getApiKey(),
+            'PS_HESABFA_API_TOKEN' => $settingService->getApiToken(),
         );
     }
 
@@ -215,10 +218,18 @@ class Ps_hesabfa extends Module
     protected function postProcess()
     {
         $form_values = $this->getConfigFormValues();
+        $apiKey = Tools::getValue('PS_HESABFA_API_KEY');
+        $apiToken = Tools::getValue('PS_HESABFA_API_TOKEN');
 
-        foreach (array_keys($form_values) as $key) {
-            Configuration::updateValue($key, Tools::getValue($key));
-        }
+        $settingService = new SettingService();
+        $settingService->setApiKeyAndToken($apiKey, $apiToken);
+
+        // connect to Hesabfa
+        $apiService = new HesabfaApiService($settingService);
+        $result = $apiService->settingGetSubscriptionInfo();
+
+        $logService = new LogService();
+        $logService->writeLogObj($result);
     }
 
     /**
