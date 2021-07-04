@@ -128,6 +128,8 @@ class Ps_hesabfa extends Module
                 $this->context->smarty->assign('subscription', $result->Result->Subscription);
                 $this->context->smarty->assign('expireDate', date("Y/m/d", $result->Result->ExpireDate));
                 $this->context->smarty->assign('documentCredit', $result->Result->Credit);
+                $this->context->smarty->assign('tokenHesabfaSettings', Tools::getAdminTokenLite('HesabfaSettings'));
+                $this->context->smarty->assign('tokenImportExport', Tools::getAdminTokenLite('ImportExport'));
             }
         }
 
@@ -139,9 +141,9 @@ class Ps_hesabfa extends Module
     public function createTabLink() {
         $tab = new Tab;
         foreach (Language::getLanguages() as $lang) {
-            $tab->name[$lang['id_lang']] = $this->l('origin');
+            $tab->name[$lang['id_lang']] = $this->l('Hesabfa Plugin Settings');
         }
-        $tab->class_name = 'AdminOrigin';
+        $tab->class_name = 'HesabfaSettings';
         $tab->module = $this->name;
         $tab->id_parent = (int) Tab::getIdFromClassName('ShopParameters');
         $tab->add();

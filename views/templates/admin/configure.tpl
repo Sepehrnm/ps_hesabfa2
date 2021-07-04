@@ -12,6 +12,25 @@ for free. After you signed up and entered your account, choose your business,
 then in the settings menu/API, you can find the API keys for the business and
 import them to the plugin’s settings. Now your module is ready to use.' mod='ps_hesabfa'}<br />
 	</p>
+
+	{if $showBusinessInfo eq true}
+
+		<a href="?controller=HesabfaSettings&token={$tokenHesabfaSettings}" class="btn btn-info">
+			<i class="icon-gear" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
+			{l s='Plugin Settings' mod='ps_hesabfa'}</a>
+
+		<a href="?controller=ImportExport&token={$tokenImportExport}" class="btn btn-info">
+			<i class="icon-exchange" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
+			{l s='Import And Export' mod='ps_hesabfa'}</a>
+
+		<a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank" class="btn btn-warning">
+			<i class="icon-question" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
+			{l s='Plugin Help' mod='ps_hesabfa'}</a>
+
+		<a href="https://app.hesabfa.com/u/login" target="_blank" class="btn btn-success">
+			<i class="icon-arrow-right" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
+			{l s='Login To Hesabfa' mod='ps_hesabfa'}</a>
+	{/if}
 </div>
 
 <div class="panel">
