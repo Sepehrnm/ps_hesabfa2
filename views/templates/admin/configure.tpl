@@ -23,3 +23,14 @@ import them to the plugin’s settings. Now your module is ready to use.' mod='p
 		</ul>
 	</p>
 </div>
+
+{if $showBusinessInfo eq true}
+	<div class="panel hesabfa-f">
+		<h3><i class="icon icon-tags"></i> {l s='Business Information' mod='ps_hesabfa'}</h3>
+		{l s='Business Name' mod='ps_hesabfa'}: <strong>{$businessName}</strong><br>
+		{l s='Subscription Plan' mod='ps_hesabfa'}: <strong>{$subscription}</strong><br>
+		{l s='Document Credit' mod='ps_hesabfa'}: <strong>{$documentCredit}</strong><br>
+		{l s='Expire Date' mod='ps_hesabfa'}: <strong>{$expireDate}</strong>
+	</div>
+{/if}
+

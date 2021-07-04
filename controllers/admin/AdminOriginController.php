@@ -14,8 +14,7 @@ class AdminOriginController extends ModuleAdminController
         parent::init();
         $this->bootstrap = true;
 
-        $logService = new LogService();
-        $logService->writeLogStr("test");
+        LogService::writeLogStr("test");
     }
 
     public function initContent() {

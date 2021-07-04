@@ -102,13 +102,36 @@ class Ps_hesabfa extends Module
         /**
          * If values have been submitted in the form, process.
          */
+        $output = '';
+
         if (((bool)Tools::isSubmit('submitPs_hesabfaModule')) == true) {
-            $this->postProcess();
+            $result = $this->postProcess();
+            if($result) {
+                if($result["success"])
+                    $output .= $this->displayConfirmation($result["message"]);
+                else
+                    $output .= $this->displayError($result["message"]);
+            }
         }
 
         $this->context->smarty->assign('module_dir', $this->_path);
 
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+        $settingService = new SettingService();
+        $apiKey = $settingService->getApiKey();
+        $apiToken = $settingService->getApiToken();
+        if($apiKey && $apiToken) {
+            $apiService = new HesabfaApiService($settingService);
+            $result = $apiService->settingGetSubscriptionInfo();
+            if($result->Success) {
+                $this->context->smarty->assign('showBusinessInfo', true);
+                $this->context->smarty->assign('businessName', $result->Result->Name);
+                $this->context->smarty->assign('subscription', $result->Result->Subscription);
+                $this->context->smarty->assign('expireDate', date("Y/m/d", $result->Result->ExpireDate));
+                $this->context->smarty->assign('documentCredit', $result->Result->Credit);
+            }
+        }
+
+        $output .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
 
         return $output.$this->renderForm();
     }
@@ -228,8 +251,11 @@ class Ps_hesabfa extends Module
         $apiService = new HesabfaApiService($settingService);
         $result = $apiService->settingGetSubscriptionInfo();
 
-        $logService = new LogService();
-        $logService->writeLogObj($result);
+        if($result->Success) {
+            return (array("success"=>true,"message"=>$this->l("Connected to Hesabfa successfully.")));
+        } else {
+            return (array("success"=>true,"message"=>"Unable to connect to Hesabfa, error code: $result->ErrorCode, error message: $result->ErrorMessage"));
+        }
     }
 
     /**
@@ -254,9 +280,8 @@ class Ps_hesabfa extends Module
 
     public function hookActionProductAdd($params)
     {
-        $logService = new LogService();
-        $logService->writeLogStr("product add hook called!");
-        $logService->writeLogObj($params);
+        LogService::writeLogStr("product add hook called!");
+        LogService::writeLogObj($params);
     }
 
     public function hookActionProductDelete()
@@ -272,21 +297,17 @@ class Ps_hesabfa extends Module
         $this->hookProductUpdateCalled = true;
 
         $product = new Product($params["id_product"]);
-
         $productService = new ProductService();
 
-
-
-        $logService = new LogService();
-        $logService->writeLogStr("product update hook called!");
-        $logService->writeLogStr('id:' . $params["id_product"]);
-        $logService->writeLogStr('tax_rate:' . $params["product"]->tax_rate);
-        $logService->writeLogStr('name:' . $params["product"]->name[1]);
-        $logService->writeLogStr('quantity:' . $params["product"]->quantity);
+        LogService::writeLogStr("product update hook called!");
+        LogService::writeLogStr('id:' . $params["id_product"]);
+        LogService::writeLogStr('tax_rate:' . $params["product"]->tax_rate);
+        LogService::writeLogStr('name:' . $params["product"]->name[1]);
+        LogService::writeLogStr('quantity:' . $params["product"]->quantity);
 
 //        $logService->writeLogObj($params["product"]);
         $productQuantity = StockAvailable::getQuantityAvailableByProduct($params["id_product"]);
-        $logService->writeLogStr("product quantity: $productQuantity");
+        LogService::writeLogStr("product quantity: $productQuantity");
         //$logService->writeLogObj();
     }
 }
