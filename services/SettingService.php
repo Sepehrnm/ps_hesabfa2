@@ -74,6 +74,10 @@ interface ISettingService
 
     public function getUpdateQuantityFromHesabfaToStore();
 
+    public function setHesabfaDefaultCurrency($value);
+
+    public function getHesabfaDefaultCurrency();
+
     public function setDefaultSettings();
 
     public function deleteAllSettings();
@@ -268,6 +272,16 @@ class SettingService implements ISettingService
         return $this->getSetting("UPDATE_QUANTITY_FROM_HESABFA_TO_STORE");
     }
 
+    public function setHesabfaDefaultCurrency($value)
+    {
+        $this->setSetting("DEFAULT_CURRENCY", $value);
+    }
+
+    public function getHesabfaDefaultCurrency()
+    {
+        return $this->getSetting("DEFAULT_CURRENCY");
+    }
+
     public function setDefaultSettings()
     {
         $this->setLiveMode(0);
@@ -282,8 +296,9 @@ class SettingService implements ISettingService
         $this->setUpdateQuantityFromHesabfaToStore(1);
         $this->setLastChangesLogId(0);
         $this->setInWhichStatusAddInvoiceToHesabfa(1);
-        $this->setInWhichStatusAddReturnInvoiceToHesabfa(1);
-        $this->setWhichNumberSetAsInvoiceReference(1);
+        $this->setInWhichStatusAddReturnInvoiceToHesabfa(2);
+        $this->setInWhichStatusAddPaymentReceipt(3);
+        $this->setWhichNumberSetAsInvoiceReference(0);
     }
 
     public function deleteAllSettings()
@@ -296,4 +311,5 @@ class SettingService implements ISettingService
             Configuration::deleteByName($configuration['name']);
         }
     }
+
 }

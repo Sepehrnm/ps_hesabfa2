@@ -254,11 +254,37 @@ class Ps_hesabfa extends Module
         $result = $apiService->settingGetSubscriptionInfo();
 
         if($result->Success) {
+            $this->getAndSetHesabfaDefaultCurrency($settingService);
             return (array("success"=>true,"message"=>$this->l("Connected to Hesabfa successfully.")));
         } else {
             return (array("success"=>true,"message"=>"Unable to connect to Hesabfa, error code: $result->ErrorCode, error message: $result->ErrorMessage"));
         }
     }
+
+    private function getAndSetHesabfaDefaultCurrency($settingService) {
+        $apiService = new HesabfaApiService($settingService);
+        $result = $apiService->settingGetCurrency();
+        if ($result->Success) {
+            $id_currency = Currency::getIdByIsoCode($result->Result->Currency);
+            if ($id_currency > 0) {
+                $settingService->setHesabfaDefaultCurrency($id_currency);
+            } elseif (_PS_VERSION_ > 1.7) {
+                $currency = new Currency();
+                $currency->iso_code = $result->Result->Currency;
+
+                if ($currency->add()) {
+                    $settingService->setHesabfaDefaultCurrency($currency->id);
+                    $msg = 'ssbhesabfa - Hesabfa default currency('. $result->Result->Currency .') added to Online Store';
+                    LogService::writeLogStr($msg);
+                }
+            }
+        } else {
+            $msg = 'Cannot check the Hesabfa default currency. Error Message: ' . $result->ErrorMessage;
+            LogService::writeLogStr($msg . ', Error Code: ' . $result->ErrorCode);
+        }
+    }
+
+
 
     /**
     * Add the CSS & JavaScript files you want to be loaded in the BO.

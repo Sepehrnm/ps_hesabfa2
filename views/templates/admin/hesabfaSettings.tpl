@@ -19,7 +19,7 @@
         <div class="checkbox">
             <label>
                 <input type="checkbox" {if $updatePriceFromHesabfaToStore eq 1} checked {/if}
-                id="updatePriceFromHesabfaToStore">
+                       id="updatePriceFromHesabfaToStore">
                 {l s='Update price from Hesabfa to Store' mod='ps_hesabfa'}
             </label>
         </div>
@@ -56,7 +56,7 @@
         <div class="form-group" style="margin-top: 10px;">
             <label>Customers category name</label>
             <input type="text" class="form-control" id="hesabfa-setting-customer-category"
-                   placeholder="Online store customers" style="max-width: 250px">
+                   placeholder="Online store customers" value="{$customerCategoryName}" style="max-width: 250px">
         </div>
 
         {* ================= Invoice settings ================= *}
@@ -66,20 +66,22 @@
         <label>{l s='Invoice reference number' mod='ps_hesabfa'}</label>&nbsp;
         <small>({l s='Which number use as reference number in Hesabfa' mod='ps_hesabfa'})</small>
         <select class="form-control" style="max-width: 250px" id="hesabfa-setting-invoice-reference">
-            <option>{l s='Order ID' mod='ps_hesabfa'}</option>
-            <option>{l s='Order Reference' mod='ps_hesabfa'}</option>
+            <option {if $selectedInvoiceReference eq 0} selected {/if}>{l s='Order ID' mod='ps_hesabfa'}</option>
+            <option {if $selectedInvoiceReference eq 1} selected {/if}>{l s='Order Reference' mod='ps_hesabfa'}</option>
         </select>
 
         <label style="margin-top: 10px">{l s='In which statuses save invoice in Hesabfa' mod='ps_hesabfa'}</label>&nbsp;
-        <select multiple class="form-control" id="hesabfa-setting-invoice-status" style="max-width: 250px">
-            <option>1</option>
-            <option>2</option>
+        <select class="form-control" id="hesabfa-setting-invoice-status" style="max-width: 250px">
+            {foreach from=$orderStatusOptions item=i}
+                <option {if $selectedInvoiceStatus eq $i.id} selected {/if} value="{$i.id}">{$i.name}</option>
+            {/foreach}
         </select>
 
         <label style="margin-top: 10px">{l s='In which statuses save return invoice in Hesabfa' mod='ps_hesabfa'}</label>&nbsp;
-        <select multiple class="form-control" id="hesabfa-setting-return-invoice-status" style="max-width: 250px">
-            <option>1</option>
-            <option>2</option>
+        <select class="form-control" id="hesabfa-setting-return-invoice-status" style="max-width: 250px">
+            {foreach from=$orderStatusOptions item=i}
+                <option {if $selectedReturnInvoiceStatus eq $i.id} selected {/if} value="{$i.id}">{$i.name}</option>
+            {/foreach}
         </select>
 
         {* ================= Receipt settings ================= *}
@@ -88,18 +90,26 @@
         <hr>
 
         <label style="margin-top: 10px">{l s='In which statuses save invoice receive receipt in Hesabfa' mod='ps_hesabfa'}</label>&nbsp;
-        <select multiple class="form-control" id="hesabfa-setting-return-invoice-status" style="max-width: 250px">
-            <option>1</option>
-            <option>2</option>
+        <select class="form-control" id="hesabfa-setting-invoice-receipt-status" style="max-width: 250px">
+            {foreach from=$orderStatusOptions item=i}
+                <option {if $selectedInvoiceReceiptStatus eq $i.id} selected {/if} value="{$i.id}">{$i.name}</option>
+            {/foreach}
         </select>
+
+        <p style="margin-top: 15px;">
+            Select in every Payment Method which bank should be affected.
+        </p>
 
         {* loop for payment methods *}
-        <label style="margin-top: 10px">{l s='payment method1' mod='ps_hesabfa'}</label>&nbsp;
-        <select class="form-control" id="hesabfa-setting-return-invoice-status" style="max-width: 250px">
-            <option>1</option>
-            <option>2</option>
-        </select>
-
+        {foreach from=$paymentMethods item=p}
+            <label style="margin-top: 10px">{l s=$p.name mod='ps_hesabfa'}</label>&nbsp;
+            <select class="form-control" id="hesabfa-setting-payment-{$p.id}" style="max-width: 250px">
+                {foreach from=$banks item=b}
+                    <option {if $selectedBanks[$p.id] eq $b.id} selected {/if}
+                            value="{$b.id}">{$b.name}</option>
+                {/foreach}
+            </select>
+        {/foreach}
 
     </div>
 
@@ -114,7 +124,8 @@
     jQuery(function ($) {
         $('#save').click(function () {
 
-            const selectedBarcode = $('#hesabfa-settings-barcode').prop('selectedIndex');;
+            const selectedBarcode = $('#hesabfa-settings-barcode').prop('selectedIndex');
+            ;
 
             const data = {
                 'ajax': true,

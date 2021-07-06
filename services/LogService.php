@@ -1,7 +1,5 @@
 <?php
 
-namespace hesabfa\services;
-
 class LogService
 {
     private static $fileName = _PS_MODULE_DIR_ . 'ps_hesabfa/' . "hesabfa-log.txt";
