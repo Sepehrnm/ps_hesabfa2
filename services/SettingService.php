@@ -284,8 +284,8 @@ class SettingService implements ISettingService
 
     public function setDefaultSettings()
     {
-        $this->setLiveMode(0);
-        $this->setDebugMode(0);
+        $this->setLiveMode(false);
+        $this->setDebugMode(false);
         $this->setApiKeyAndToken(null, null);
         $this->setWebhookPassword(bin2hex(openssl_random_pseudo_bytes(16)));
         $this->setCustomerAddressStatus(1);

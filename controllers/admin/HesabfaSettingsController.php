@@ -29,6 +29,8 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('customerCategoryName', $settingService->getCustomersCategory());
         $this->context->smarty->assign('selectedInvoiceReference', $settingService->getWhichNumberSetAsInvoiceReference());
 
+        LogService::writeLogStr($settingService->getUpdatePriceFromHesabfaToStore());
+
         $orderStatusOptions = array();
         $order_states = OrderState::getOrderStates(Context::getContext()->language->id);
         foreach ($order_states as $order_state) {
@@ -48,12 +50,13 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('paymentMethods', $paymentMethods);
         $this->context->smarty->assign('banks', $banks);
 
-        //LogService::writeLogObj($banks);
-
-        $selectedBanks = array();
+        $selectedBanks = [];
         foreach ($paymentMethods as $p) {
-            $this->context->smarty->assign($selectedBanks[$p["id"]], 0);
+            $bankId = $settingService->getPaymentReceiptDestination($p["id"]);
+            LogService::writeLogStr('bank id: ' . $bankId);
+            $selectedBanks[$p["id"]] = $bankId;
         }
+        $this->context->smarty->assign('selectedBanks', $selectedBanks);
 
         $this->setTemplate('hesabfaSettings.tpl');
     }
@@ -76,7 +79,7 @@ class HesabfaSettingsController extends ModuleAdminController
 
     public function getBanksInHesabfa() {
         $bank_options = array(array(
-            'id_option' => -1,
+            'id' => -1,
             'name' => $this->l('Not Selected'),
         ));
 
@@ -103,7 +106,28 @@ class HesabfaSettingsController extends ModuleAdminController
     }
 
     public function  ajaxProcessSaveSettings() {
-        echo Tools::getValue('selected-barcode');
+        $formData = Tools::getValue('formData');
+
+        $settingService = new SettingService();
+        $settingService->setCodeToUseAsBarcode($formData["selectedBarcode"]);
+        $settingService->setUpdatePriceFromHesabfaToStore($formData["updatePriceFromHesabfaToStore"]);
+        $settingService->setUpdatePriceFromStoreToHesabfa($formData["updatePriceFromStoreToHesabfa"]);
+        $settingService->setUpdateQuantityFromHesabfaToStore($formData["updateQuantityFromHesabfaToStore"]);
+
+        $settingService->setCustomerAddressStatus($formData["selectedCustomerAddress"]);
+        $settingService->setCustomersCategory($formData["customerCategory"]);
+
+        $settingService->setWhichNumberSetAsInvoiceReference($formData["invoiceReference"]);
+        $settingService->setInWhichStatusAddInvoiceToHesabfa($formData["invoiceStatus"]);
+        $settingService->setInWhichStatusAddReturnInvoiceToHesabfa($formData["returnInvoiceStatus"]);
+
+        $settingService->setInWhichStatusAddPaymentReceipt($formData["invoiceReceiptStatus"]);
+
+        foreach ($formData["paymentMethods"] as $paymentMethod) {
+            $settingService->setPaymentReceiptDestination($paymentMethod["paymentMethodId"], $paymentMethod["bankId"]);
+        }
+
+        echo true;
         die;
     }
 

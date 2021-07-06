@@ -18,7 +18,7 @@
 
         <div class="checkbox">
             <label>
-                <input type="checkbox" {if $updatePriceFromHesabfaToStore eq 1} checked {/if}
+                <input type="checkbox" {if $updatePriceFromHesabfaToStore eq true} checked {/if}
                        id="updatePriceFromHesabfaToStore">
                 {l s='Update price from Hesabfa to Store' mod='ps_hesabfa'}
             </label>
@@ -26,7 +26,7 @@
 
         <div class="checkbox">
             <label>
-                <input type="checkbox" {if $updatePriceFromStoreToHesabfa eq 1} checked {/if}
+                <input type="checkbox" {if $updatePriceFromStoreToHesabfa eq true} checked {/if}
                        id="updatePriceFromStoreToHesabfa">
                 {l s='Update price from Store to Hesabfa' mod='ps_hesabfa'}
             </label>
@@ -34,7 +34,7 @@
 
         <div class="checkbox">
             <label>
-                <input type="checkbox" {if $updateQuantityFromHesabfaToStore eq 1} checked {/if}
+                <input type="checkbox" {if $updateQuantityFromHesabfaToStore eq true} checked {/if}
                        id="updateQuantityFromHesabfaToStore">
                 {l s='Update Quantity from Hesabfa to Store' mod='ps_hesabfa'}
             </label>
@@ -47,7 +47,7 @@
         <hr>
         <label>{l s='Customer Address' mod='ps_hesabfa'}</label>&nbsp;
         <small>({l s='When update customer address in Hesabfa' mod='ps_hesabfa'})</small>
-        <select class="form-control" style="max-width: 250px" id="hesabfa-setting-">
+        <select class="form-control" style="max-width: 250px" id="hesabfa-setting-customer-address">
             <option {if $selectedCustomerAddress eq 0} selected {/if}>{l s='Use first customer address' mod='ps_hesabfa'}</option>
             <option {if $selectedCustomerAddress eq 1} selected {/if}>{l s='Invoice address' mod='ps_hesabfa'}</option>
             <option {if $selectedCustomerAddress eq 2} selected {/if}>{l s='Delivery address' mod='ps_hesabfa'}</option>
@@ -103,7 +103,7 @@
         {* loop for payment methods *}
         {foreach from=$paymentMethods item=p}
             <label style="margin-top: 10px">{l s=$p.name mod='ps_hesabfa'}</label>&nbsp;
-            <select class="form-control" id="hesabfa-setting-payment-{$p.id}" style="max-width: 250px">
+            <select class="form-control payment-method" data-id="{$p.id}" style="max-width: 250px">
                 {foreach from=$banks item=b}
                     <option {if $selectedBanks[$p.id] eq $b.id} selected {/if}
                             value="{$b.id}">{$b.name}</option>
@@ -124,19 +124,41 @@
     jQuery(function ($) {
         $('#save').click(function () {
 
-            const selectedBarcode = $('#hesabfa-settings-barcode').prop('selectedIndex');
-            ;
+            const formData = {
+                selectedBarcode: $('#hesabfa-settings-barcode').prop('selectedIndex'),
+                updatePriceFromHesabfaToStore: $('#updatePriceFromHesabfaToStore').is(':checked') ? 1 : 0,
+                updatePriceFromStoreToHesabfa: $('#updatePriceFromStoreToHesabfa').is(':checked') ? 1 : 0,
+                updateQuantityFromHesabfaToStore: $('#updateQuantityFromHesabfaToStore').is(':checked') ? 1 : 0,
+
+                selectedCustomerAddress: $('#hesabfa-setting-customer-address').prop('selectedIndex'),
+                customerCategory: $('#hesabfa-setting-customer-category').val(),
+
+                invoiceReference: $('#hesabfa-setting-invoice-reference').prop('selectedIndex'),
+                invoiceStatus: $('#hesabfa-setting-invoice-status').val(),
+                returnInvoiceStatus: $('#hesabfa-setting-return-invoice-status').val(),
+
+                invoiceReceiptStatus: $('#hesabfa-setting-invoice-receipt-status').val()
+            }
+
+            formData["paymentMethods"] = [];
+            const paymentMethodEls = $('.payment-method');
+
+            for (let i = 0; i < paymentMethodEls.length; i++) {
+                const p = paymentMethodEls[i];
+                formData["paymentMethods"].push({ paymentMethodId: $(p).attr("data-id"), bankId: $(p).val() });
+            }
 
             const data = {
                 'ajax': true,
                 'controller': 'HesabfaSettings',
                 'action': 'SaveSettings',
                 'token': token,
-                'selected-barcode': selectedBarcode
+                'formData': formData
             };
             $.post('index.php', data, function (response) {
-                console.log(response);
-                alert(response);
+                if(response) {
+                    alert("تنظیمات با موفقیت ذحیره شد.");
+                }
             });
             return false;
         });
