@@ -33,9 +33,6 @@ include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/ProductService.php');
 include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/SettingService.php');
 include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/HesabfaApiService.php');
 
-use hesabfa\services\LogService;
-use hesabfa\services\ProductService;
-
 class Ps_hesabfa extends Module
 {
     protected $config_form = false;
@@ -324,18 +321,9 @@ class Ps_hesabfa extends Module
             return;
         $this->hookProductUpdateCalled = true;
 
-        $product = new Product($params["id_product"]);
-        $productService = new ProductService();
+        $productService = new ProductService($this);
+        $productService->saveProducts(array($params["id_product"]));
 
-        LogService::writeLogStr("product update hook called!");
-        LogService::writeLogStr('id:' . $params["id_product"]);
-        LogService::writeLogStr('tax_rate:' . $params["product"]->tax_rate);
-        LogService::writeLogStr('name:' . $params["product"]->name[1]);
-        LogService::writeLogStr('quantity:' . $params["product"]->quantity);
-
-//        $logService->writeLogObj($params["product"]);
-        $productQuantity = StockAvailable::getQuantityAvailableByProduct($params["id_product"]);
-        LogService::writeLogStr("product quantity: $productQuantity");
-        //$logService->writeLogObj();
+        //$productQuantity = StockAvailable::getQuantityAvailableByProduct($params["id_product"]);
     }
 }
