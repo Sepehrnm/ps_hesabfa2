@@ -1,15 +1,15 @@
 <?php
 
-include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/PsFaService.php');
 include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/LogService.php');
+include_once(_PS_MODULE_DIR_.'ps_hesabfa/model/PsFa.php');
 
 class PsFaService
 {
-    public function getPsFa($objType, $idPs, $idPsAttribute = 0) {
-        if (!isset($objType) || !isset($id_ps)) {
-            return false;
-        }
+    public function __construct()
+    {
+    }
 
+    public function getPsFa($objType, $idPs, $idPsAttribute = 0) {
         $sql = 'SELECT * 
                     FROM `' . _DB_PREFIX_ . 'ps_hesabfa`
                     WHERE `id_ps` = '. $idPs .' AND `id_ps_attribute` = \''. $idPsAttribute .'\' AND `obj_type` = \''. $objType .'\'
@@ -23,10 +23,6 @@ class PsFaService
     }
 
     public function getPsFaId($objType, $idPs, $idPsAttribute = 0) {
-        if (!isset($objType) || !isset($id_ps)) {
-            return false;
-        }
-
         $sql = 'SELECT `id` 
                     FROM `' . _DB_PREFIX_ . 'ps_hesabfa`
                     WHERE `id_ps` = '. $idPs .' AND `id_ps_attribute` = \''. $idPsAttribute .'\' AND `obj_type` = \''. $objType .'\'
@@ -45,11 +41,11 @@ class PsFaService
 
     public function mapPsFa($sqlObj) {
         $psFa = new PsFa();
-        $psFa->id = $sqlObj->id;
-        $psFa->idHesabfa = $sqlObj->id_hesabfa;
-        $psFa->idPs = $sqlObj->id_ps;
-        $psFa->idPsAttribute = $sqlObj->id_ps_attribute;
-        $psFa->objType = $sqlObj->obj_type;
+        $psFa->id = $sqlObj["id"];
+        $psFa->idHesabfa = $sqlObj["id_hesabfa"];
+        $psFa->idPs = $sqlObj["id_ps"];
+        $psFa->idPsAttribute = $sqlObj["id_ps_attribute"];
+        $psFa->objType = $sqlObj["obj_type"];
         return $psFa;
     }
 

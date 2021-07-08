@@ -7,11 +7,11 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
 
 class ProductService
 {
-    public $moduleObj = null;
+    public $idLang;
 
-    public function __construct($moduleObj)
+    public function __construct($idDefaultLang)
     {
-        $this->$moduleObj = $moduleObj;
+        $this->idLang = $idDefaultLang;
     }
 
     public function saveProducts($productIdArray)
@@ -28,7 +28,7 @@ class ProductService
 
             // set attributes
             if ($product->hasAttributes() > 0) {
-                $combinations = $product->getAttributesResume($this->moduleObj->id_default_lang);
+                $combinations = $product->getAttributesResume($this->idLang);
                 foreach ($combinations as $combination) {
                     $items[] = $this->mapProductCombination($product, $combination, $productId, false);
                 }
@@ -45,7 +45,7 @@ class ProductService
 
     private function saveProductsToHesabfa($items)
     {
-        $apiService = new HesabfaApiService();
+        $apiService = new HesabfaApiService(new SettingService());
         $psFaService = new PsFaService();
         $response = $apiService->itemBatchSave($items);
 
@@ -66,11 +66,11 @@ class ProductService
 
         $hesabfaItem = array(
             'Code' => $code,
-            'Name' => mb_substr($product->name[$this->moduleObj->id_default_lang], 0, 99),
-            'PurchasesTitle' => mb_substr($product->name[$this->moduleObj->id_default_lang], 0, 99),
-            'SalesTitle' => mb_substr($product->name[$this->moduleObj->id_default_lang], 0, 99),
+            'Name' => mb_substr($product->name[$this->idLang], 0, 99),
+            'PurchasesTitle' => mb_substr($product->name[$this->idLang], 0, 99),
+            'SalesTitle' => mb_substr($product->name[$this->idLang], 0, 99),
             'ItemType' => ($product->is_virtual == 1 ? 1 : 0),
-            'Barcode' => $this->getBarcode($id),
+            'Barcode' => $this->getBarcode($product),
             'Tag' => json_encode(array('id_product' => $id, 'id_attribute' => 0)),
             'NodeFamily' => $this->getCategoryPath($product->id_category_default),
             'ProductCode' => $id
@@ -88,7 +88,7 @@ class ProductService
         $psFaService = new PsFaService();
         $code = $new ? null : $psFaService->getProductCodeByPrestaId($id, $combination['id_product_attribute']);
 
-        $fullName = mb_substr($product->name[$this->id_default_lang] . ' - ' . $combination['attribute_designation'], 0, 99);
+        $fullName = mb_substr($product->name[$this->idLang] . ' - ' . $combination['attribute_designation'], 0, 99);
 
         $hesabfaItem = array(
             'Code' => $code,
@@ -96,7 +96,7 @@ class ProductService
             'PurchasesTitle' => $fullName,
             'SalesTitle' => $fullName,
             'ItemType' => ($product->is_virtual == 1 ? 1 : 0),
-            'Barcode' => $this->getBarcode($id, $combination['id_product_attribute']),
+            'Barcode' => $this->getBarcode($product, $combination['id_product_attribute']),
             'Tag' => json_encode(array('id_product' => $id, 'id_attribute' => (int)$combination['id_product_attribute'])),
             'NodeFamily' => $this->getCategoryPath($product->id_category_default),
             'ProductCode' => $combination['id_product_attribute']
@@ -109,4 +109,70 @@ class ProductService
         return $hesabfaItem;
     }
 
+    private function getBarcode($product, $id_attribute = 0)
+    {
+        if (!isset($product))
+            return false;
+
+        $settingService = new SettingService();
+        $codeToUseAsBarcode = $settingService->getCodeToUseAsBarcode();
+
+        if ($id_attribute == 0) {
+            switch ($codeToUseAsBarcode) {
+                case 1:
+                    return $product->reference;
+                case 2:
+                    return $product->upc;
+                case 3:
+                    return $product->ean13;
+                case 4:
+                    return $product->isbn;
+            }
+        } else {
+            $product_attribute = $product->getAttributeCombinationsById($id_attribute, $this->idLang);
+            switch ($codeToUseAsBarcode) {
+                case 1:
+                    return $product_attribute[0]['reference'];
+                case 2:
+                    return $product_attribute[0]['upc'];
+                case 3:
+                    return $product_attribute[0]['ean13'];
+                case 4:
+                    return $product_attribute[0]['isbn'];
+            }
+        }
+
+        return false;
+    }
+
+    private function getCategoryPath($id_category)
+    {
+        if ($id_category < 2) {
+            $sign = ' : '; // You can customize your sign which splits categories
+            //array_pop($this->categoryArray);
+            $categoryArray = array_reverse($this->categoryArray);
+            $categoryPath = '';
+            foreach ($categoryArray as $categoryName) {
+                $categoryPath .= $categoryName.$sign;
+            }
+            $this->categoryArray = array();
+            return Tools::substr($categoryPath, 0, -Tools::strlen($sign));
+        } else {
+            $category = new Category($id_category, Context::getContext()->language->id);
+            $this->categoryArray[] = $category->name;
+            return $this->getCategoryPath($category->id_parent);
+        }
+    }
+
+    public static function getPriceInHesabfaDefaultCurrency($price)
+    {
+        if (!isset($price))
+            return false;
+
+        $settingService = new SettingService();
+
+        $currency = new Currency($settingService->getHesabfaDefaultCurrency());
+        $price *= $currency->conversion_rate;
+        return $price;
+    }
 }

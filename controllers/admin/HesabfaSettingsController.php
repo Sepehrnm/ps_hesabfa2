@@ -53,7 +53,6 @@ class HesabfaSettingsController extends ModuleAdminController
         $selectedBanks = [];
         foreach ($paymentMethods as $p) {
             $bankId = $settingService->getPaymentReceiptDestination($p["id"]);
-            LogService::writeLogStr('bank id: ' . $bankId);
             $selectedBanks[$p["id"]] = $bankId;
         }
         $this->context->smarty->assign('selectedBanks', $selectedBanks);

@@ -8,4 +8,8 @@ class PsFa
     public $idHesabfa;
     public $idPs;
     public $idPsAttribute;
+
+    public function __construct()
+    {
+    }
 }

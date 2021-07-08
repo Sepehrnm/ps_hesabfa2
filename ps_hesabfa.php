@@ -36,6 +36,7 @@ include_once(_PS_MODULE_DIR_.'ps_hesabfa/services/HesabfaApiService.php');
 class Ps_hesabfa extends Module
 {
     protected $config_form = false;
+    public $id_default_lang;
 
     public function __construct()
     {
@@ -58,6 +59,7 @@ class Ps_hesabfa extends Module
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall Hesabfa module? Notice that relation table between Hesabfa and Prestashop  will be deleted.');
 
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->id_default_lang = Configuration::get('PS_LANG_DEFAULT');
     }
 
     /**
@@ -321,9 +323,7 @@ class Ps_hesabfa extends Module
             return;
         $this->hookProductUpdateCalled = true;
 
-        $productService = new ProductService($this);
+        $productService = new ProductService($this->id_default_lang);
         $productService->saveProducts(array($params["id_product"]));
-
-        //$productQuantity = StockAvailable::getQuantityAvailableByProduct($params["id_product"]);
     }
 }
