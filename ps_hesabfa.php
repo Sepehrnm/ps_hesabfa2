@@ -80,6 +80,7 @@ class Ps_hesabfa extends Module
             $this->registerHook('backOfficeHeader') &&
             $this->registerHook('actionProductDelete') &&
             $this->registerHook('actionProductUpdate') &&
+            $this->registerHook('actionAdminAfter') &&
             $this->createTabLink();
     }
 
@@ -294,6 +295,8 @@ class Ps_hesabfa extends Module
             $this->context->controller->addJS($this->_path.'views/js/back.js');
             $this->context->controller->addCSS($this->_path.'views/css/back.css');
         }
+
+        $this->cronJob();
     }
 
     /**
@@ -303,17 +306,6 @@ class Ps_hesabfa extends Module
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
-    }
-
-    public function hookActionProductAdd($params)
-    {
-        LogService::writeLogStr("product add hook called!");
-        LogService::writeLogObj($params);
-    }
-
-    public function hookActionProductDelete()
-    {
-        /* Place your code here. */
     }
 
     private $hookProductUpdateCalled = false;
@@ -326,4 +318,16 @@ class Ps_hesabfa extends Module
         $productService = new ProductService($this->id_default_lang);
         $productService->saveProducts(array($params["id_product"]));
     }
+
+    public function hookActionProductDelete($params)
+    {
+        $productService = new ProductService($this->id_default_lang);
+        $productService->deleteProduct($params["id_product"]);
+    }
+
+    public function cronJob()
+    {
+        LogService::writeLogStr("===== AAA =====");
+    }
+
 }

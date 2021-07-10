@@ -36,6 +36,17 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ps_hesabfa` (
     PRIMARY KEY  (`id`)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
+$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ps_hesabfa_action_queue` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `action` varchar(50) NOT NULL,
+    `json_data` varchar(20000) UNSIGNED NOT NULL,
+    `submit_date` datetime NOT NULL,
+    `process_date` datetime NOT NULL,
+    `retry_count` int NOT NULL DEFAULT 0,
+    `status` varchar(50) NOT NULL,
+    PRIMARY KEY  (`id`)
+) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
 // copy data from previous plugin table
 
 $sql[] = 'INSERT INTO `' . _DB_PREFIX_ . 'ps_hesabfa`

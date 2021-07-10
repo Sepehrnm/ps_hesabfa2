@@ -59,7 +59,7 @@ class ProductService
         }
     }
 
-    public function mapProduct($product, $id, $new = true)
+    private function mapProduct($product, $id, $new = true)
     {
         $psFaService = new PsFaService();
         $code = $new ? null : $psFaService->getProductCodeByPrestaId($id);
@@ -83,7 +83,7 @@ class ProductService
         return $hesabfaItem;
     }
 
-    public function mapProductCombination($product, $combination, $id, $new = true)
+    private function mapProductCombination($product, $combination, $id, $new = true)
     {
         $psFaService = new PsFaService();
         $code = $new ? null : $psFaService->getProductCodeByPrestaId($id, $combination['id_product_attribute']);
@@ -164,7 +164,7 @@ class ProductService
         }
     }
 
-    public static function getPriceInHesabfaDefaultCurrency($price)
+    private function getPriceInHesabfaDefaultCurrency($price)
     {
         if (!isset($price))
             return false;
@@ -174,5 +174,9 @@ class ProductService
         $currency = new Currency($settingService->getHesabfaDefaultCurrency());
         $price *= $currency->conversion_rate;
         return $price;
+    }
+
+    public function deleteProduct($productId) {
+        LogService::writeLogStr("======= Delete Product, Id: $productId");
     }
 }
