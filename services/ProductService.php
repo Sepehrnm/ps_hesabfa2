@@ -153,7 +153,7 @@ class ProductService
             $categoryArray = array_reverse($this->categoryArray);
             $categoryPath = '';
             foreach ($categoryArray as $categoryName) {
-                $categoryPath .= $categoryName.$sign;
+                $categoryPath .= $categoryName . $sign;
             }
             $this->categoryArray = array();
             return Tools::substr($categoryPath, 0, -Tools::strlen($sign));
@@ -176,7 +176,62 @@ class ProductService
         return $price;
     }
 
-    public function deleteProduct($productId) {
-        LogService::writeLogStr("======= Delete Product, Id: $productId");
+    public function deleteProduct($productId)
+    {
+        $psFaService = new PsFaService();
+        $psFaObjects = $psFaService->getProductAndCombinations($productId);
+
+        foreach ($psFaObjects as $psFaObject) {
+            $hesabfaApi = new HesabfaApiService(new SettingService());
+            $response = $hesabfaApi->itemDelete($psFaObject->idHesabfa);
+            if ($response->Success) {
+                $msg = "Product successfully deleted, product Hesabfa code: " . $psFaObject->idHesabfa . ", product Prestashop id: " . $psFaObject->idPs . "-" . $psFaObject->idPsAttribute;
+                LogService::writeLogStr($msg);
+            } else {
+                $msg = 'Cannot delete product in Hesabfa.Error Code: ' . $response->ErrorCode . ', Error Message: ' . $response->ErrorMessage . ', product Hesabfa code: ' . $psFaObject->idHesabfa . ", product Prestashop id: " . $psFaObject->idPs . "-" . $psFaObject->idPsAttribute;
+                LogService::writeLogStr($msg);
+            }
+
+            $psFaService->delete($psFaObject);
+        }
+    }
+
+    public function deleteRemovedCombinationsOfProduct($productId)
+    {
+        $product = new Product($productId);
+        $combinations = $product->getAttributesResume($this->idLang);
+
+        $psFaService = new PsFaService();
+        $psFaObjects = $psFaService->getProductAndCombinations($productId);
+
+        foreach ($psFaObjects as $psFaObject) {
+            $found = false;
+            if($psFaObject->idPsAttribute == 0)
+                $found = true;
+            foreach ($combinations as $combination) {
+                if ($combination["id_product_attribute"] == $psFaObject->idPsAttribute)
+                    $found = true;
+            }
+            if (!$found)
+                $this->deleteProductCombination($psFaObject->idPs, $psFaObject->idPsAttribute);
+        }
+    }
+
+    public function deleteProductCombination($productId, $combinationId)
+    {
+        $psFaService = new PsFaService();
+        $psFaObject = $psFaService->getPsFa('product', $productId, $combinationId);
+
+        $hesabfaApi = new HesabfaApiService(new SettingService());
+        $response = $hesabfaApi->itemDelete($psFaObject->idHesabfa);
+        if ($response->Success) {
+            $msg = "Product successfully deleted, product Hesabfa code: " . $psFaObject->idHesabfa . ", product Prestashop id: " . $psFaObject->idPs . "-" . $psFaObject->idPsAttribute;
+            LogService::writeLogStr($msg);
+        } else {
+            $msg = 'Cannot delete product in Hesabfa.Error Code: ' . $response->ErrorCode . ', Error Message: ' . $response->ErrorMessage . ', product Hesabfa code: ' . $psFaObject->idHesabfa . ", product Prestashop id: " . $psFaObject->idPs . "-" . $psFaObject->idPsAttribute;
+            LogService::writeLogStr($msg);
+        }
+
+        $psFaService->delete($psFaObject);
     }
 }

@@ -39,6 +39,21 @@ class PsFaService
         return null;
     }
 
+    public function getProductAndCombinations($idPs) {
+        $sql = "SELECT * FROM `" . _DB_PREFIX_  . "ps_hesabfa` WHERE `obj_type` = 'product' AND `id_ps` = '$idPs'";
+        $result = Db::getInstance()->executeS($sql);
+
+        $psFaObjects = array();
+        if(isset($result) && is_array($result) && count($result) > 0)
+        {
+            foreach ($result as $item) {
+                $psFaObjects[] = $this->mapPsFa($item);
+            }
+            return $psFaObjects;
+        }
+        return null;
+    }
+
     public function mapPsFa($sqlObj) {
         $psFa = new PsFa();
         $psFa->id = $sqlObj["id"];
@@ -73,4 +88,9 @@ class PsFaService
 
         return true;
     }
+
+    public function delete($psFa) {
+        Db::getInstance()->delete('ps_hesabfa', 'id=' . $psFa->id);
+    }
+
 }

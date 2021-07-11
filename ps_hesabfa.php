@@ -80,7 +80,16 @@ class Ps_hesabfa extends Module
             $this->registerHook('backOfficeHeader') &&
             $this->registerHook('actionProductDelete') &&
             $this->registerHook('actionProductUpdate') &&
-            $this->registerHook('actionAdminAfter') &&
+
+            $this->registerHook('actionProductAttributeAdd') &&
+            $this->registerHook('actionProductAttributeUpdate') &&
+            $this->registerHook('actionObjectDeleteAfter') &&
+
+            $this->registerHook('actionObjectCustomerAddAfter') &&
+            $this->registerHook('actionCustomerAccountUpdate') &&
+            $this->registerHook('actionObjectCustomerDeleteBefore') &&
+            $this->registerHook('actionObjectAddressAddAfter') &&
+
             $this->createTabLink();
     }
 
@@ -296,7 +305,7 @@ class Ps_hesabfa extends Module
             $this->context->controller->addCSS($this->_path.'views/css/back.css');
         }
 
-        $this->cronJob();
+        //$this->cronJob();
     }
 
     /**
@@ -323,6 +332,22 @@ class Ps_hesabfa extends Module
     {
         $productService = new ProductService($this->id_default_lang);
         $productService->deleteProduct($params["id_product"]);
+    }
+
+    public function hookActionObjectDeleteAfter($params)
+    {
+        if(is_a($params["object"], 'Combination')) {
+            $productService = new ProductService($this->id_default_lang);
+            $productService->deleteRemovedCombinationsOfProduct($params["object"]->id_product);
+        }
+    }
+
+    public function hookActionObjectCustomerAddAfter($params)
+    {
+        LogService::writeLogStr("====== hookActionObjectCustomerAddAfter ======");
+//        if (Configuration::get('SSBHESABFA_LIVE_MODE')) {
+//            $this->setContact($params['object']->id);
+//        }
     }
 
     public function cronJob()
