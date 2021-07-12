@@ -51,7 +51,7 @@ class ProductService
 
         if ($response->Success) {
             foreach ($response->Result as $item)
-                $psFaService->save($item);
+                $psFaService->saveProduct($item);
             return true;
         } else {
             LogService::writeLogStr("Cannot add/update Hesabfa items. Error Code: " . (string)$response->ErrorCode . ". Error Message: $response->ErrorMessage.");
@@ -164,7 +164,7 @@ class ProductService
         }
     }
 
-    private function getPriceInHesabfaDefaultCurrency($price)
+    public function getPriceInHesabfaDefaultCurrency($price)
     {
         if (!isset($price))
             return false;
