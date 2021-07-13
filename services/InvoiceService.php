@@ -3,13 +3,17 @@
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/LogService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/SettingsService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/CustomerService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ProductService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/PsFaService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
 
 class InvoiceService
 {
-    public function __construct()
+    public $idLang;
+
+    public function __construct($idDefaultLang)
     {
+        $this->idLang = $idDefaultLang;
     }
 
     public function saveInvoice($orderId, $orderType = 0, $reference = null)
@@ -39,8 +43,19 @@ class InvoiceService
         return $this->saveInvoiceToHesabfa($hesabfaInvoice, $orderType);
     }
 
+    public function saveReturnInvoice($orderId, $orderStatus) {
+        $settingService = new SettingService();
+        if ($orderStatus == $settingService->getInWhichStatusAddReturnInvoiceToHesabfa()) {
+            $psFaService = new PsFaService();
+            $psFa = $psFaService->getPsFa('order', $orderId);
+            if($psFa->id > 0) {
+                $this->saveInvoice($orderId, 2, $psFa->idHesabfa);
+            }
+        }
+    }
+
     private function saveInvoiceToHesabfa($hesabfaInvoice, $orderType) {
-        $hesabfa = new HesabfaApiService();
+        $hesabfa = new HesabfaApiService(new SettingService());
         $psFaService = new PsFaService();
         $response = $hesabfa->invoiceSave($hesabfaInvoice);
         if ($response->Success) {
@@ -64,7 +79,7 @@ class InvoiceService
 
             //fix remaining discount amount on last item
             $array_key = array_keys($products);
-            $product_price = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'], $orderId);
+            $product_price = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'], $order);
 
             if (end($array_key) == $key) {
                 $discount = $order_total_discount - $total_discounts;
@@ -73,7 +88,7 @@ class InvoiceService
                 $total_discounts += $discount;
             }
 
-            $reduction_amount = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'] - $product['product_price'], $orderId);
+            $reduction_amount = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'] - $product['product_price'], $order);
             $discount += $reduction_amount * $product['product_quantity'];
 
             //fix if total discount greater than product price
@@ -88,7 +103,7 @@ class InvoiceService
                 'Quantity' => (int)$product['product_quantity'],
                 'UnitPrice' => (float)$product_price,
                 'Discount' => (float)$discount,
-                'Tax' => (float)$this->getOrderPriceInHesabfaDefaultCurrency(($product['unit_price_tax_incl'] - $product['unit_price_tax_excl']), $orderId),
+                'Tax' => (float)$this->getOrderPriceInHesabfaDefaultCurrency(($product['unit_price_tax_incl'] - $product['unit_price_tax_excl']), $order),
             );
             array_push($items, $item);
             $i++;
@@ -129,7 +144,7 @@ class InvoiceService
             $reference = $settingService->getWhichNumberSetAsInvoiceReference() ? $order->reference : $orderId;
 
         return array (
-            'Number' => $psFaService->getInvoiceCodeByPrestaId(),
+            'Number' => $psFaService->getInvoiceCodeByPrestaId($orderId),
             'InvoiceType' => $orderType,
             'ContactCode' => $psFaService->getCustomerCodeByPrestaId($order->id_customer),
             'Date' => $date,
@@ -137,7 +152,7 @@ class InvoiceService
             'Reference' => $reference,
             'Status' => 2,
             'Tag' => json_encode(array('id_order' => $orderId)),
-            'Freight' => $shipping,
+            'Freight' => $shipping != null ? $shipping : 0,
             'InvoiceItems' => $invoiceItems,
         );
     }
@@ -145,7 +160,7 @@ class InvoiceService
     private function saveInvoiceCustomer(Order $order)
     {
         $psFaService = new PsFaService();
-        $customerService = new CustomerService();
+        $customerService = new CustomerService($this->idLang);
         $settingService = new SettingService();
 
         $contactCode = $psFaService->getPsFaId('customer', $order->id_customer);
@@ -156,12 +171,13 @@ class InvoiceService
             if(!$customerService->saveCustomer($order->id_customer, $order->id_address_delivery))
                 return false;
         }
+
         return true;
     }
 
     private function saveInvoiceProducts(Order $order)
     {
-        $productService = new ProductService();
+        $productService = new ProductService($this->idLang);
         $psFaService = new PsFaService();
         $items = array();
         $products = $order->getProducts();
@@ -176,11 +192,11 @@ class InvoiceService
             else
                 return false;
         } else
-            return false;
+            return true;
     }
 
     private function getDiscount(Order $order, $orderId) {
-        $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts, $orderId);
+        $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts, $order);
         $shipping = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_shipping_tax_incl, $order);
 
         $sql = 'SELECT `free_shipping` 
@@ -190,13 +206,13 @@ class InvoiceService
 
         foreach ($result as $item) {
             if ($item['free_shipping']) {
-                $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts - $order->total_shipping_tax_incl, $orderId);
+                $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts - $order->total_shipping_tax_incl, $order);
                 $shipping = 0;
             }
         }
 
         //calculate discount split
-        $order_total_products = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_products, $orderId);
+        $order_total_products = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_products, $order);
         $split = 0;
         if ($order_total_discount > 0)
             $split = $order_total_discount / $order_total_products;
@@ -207,10 +223,10 @@ class InvoiceService
 
     public function getOrderPriceInHesabfaDefaultCurrency($price, $order)
     {
-        if (!isset($price) || !isset($id_order))
+        if (!isset($price) || !isset($order))
             return false;
         $price = $price * (int)$order->conversion_rate;
-        $productService = new ProductService();
+        $productService = new ProductService($this->idLang);
         $price = $productService->getPriceInHesabfaDefaultCurrency($price);
         return $price;
     }

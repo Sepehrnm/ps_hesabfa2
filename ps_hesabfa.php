@@ -31,6 +31,7 @@ if (!defined('_PS_VERSION_')) {
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/LogService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ProductService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/CustomerService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/InvoiceService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/SettingService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
 
@@ -92,6 +93,11 @@ class Ps_hesabfa extends Module
             $this->registerHook('actionCustomerAccountUpdate') &&
             $this->registerHook('actionObjectCustomerDeleteBefore') &&
             $this->registerHook('actionObjectAddressAddAfter') &&
+
+            $this->registerHook('actionValidateOrder') &&
+            $this->registerHook('actionPaymentConfirmation') &&
+            $this->registerHook('actionOrderStatusPostUpdate') &&
+            $this->registerHook('actionOrderEdited') &&
 
             $this->createTabLink();
     }
@@ -395,9 +401,30 @@ class Ps_hesabfa extends Module
     // Order hooks
     public function hookActionValidateOrder($params)
     {
-        LogService::writeLogStr("====== hookActionValidateOrder ======");
+        LogService::writeLogStr("====== hookActionValidateOrder ======, order id: " . $params['order']->id);
         $invoiceService = new InvoiceService($this->id_default_lang);
         $invoiceService->saveInvoice((int)$params['order']->id);
+    }
+
+    public function hookActionPaymentConfirmation($params)
+    {
+        LogService::writeLogStr("====== hookActionPaymentConfirmation ======");
+
+        //$this->setOrderPayment($params['id_order']);
+    }
+
+    public function hookActionOrderStatusPostUpdate($params)
+    {
+        LogService::writeLogStr("====== hookActionOrderStatusPostUpdate ======");
+        $invoiceService = new InvoiceService($this->id_default_lang);
+        $invoiceService->saveReturnInvoice($params['id_order'], $params['newOrderStatus']->id);
+    }
+
+    public function hookActionOrderEdited($params)
+    {
+        LogService::writeLogStr("====== hookActionOrderEdited ======");
+
+        $this->hookActionValidateOrder($params);
     }
 
     public function cronJob()

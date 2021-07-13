@@ -16,6 +16,7 @@ class CustomerService
 
     public function saveCustomer($customerId, $addressId = 0)
     {
+        LogService::writeLogStr("===save customer, customer id: " . $customerId);
         if (!isset($customerId))
             return false;
         $customer = new Customer($customerId);
@@ -56,7 +57,7 @@ class CustomerService
             $address = new Address($addressId);
             $PostalCode = mb_substr(preg_replace("/[^0-9]/", '', $address->postcode), 0, 9);
             $state = State::getNameById($address->id_state) == false ? null : State::getNameById($address->id_state);
-            $country = Country::getNameById($this->context->language->id, $address->id_country) == false ? null : Country::getNameById($this->context->language->id, $address->id_country);
+            $country = Country::getNameById($this->idLang, $address->id_country) == false ? null : Country::getNameById($this->idLang, $address->id_country);
         }
 
         $settingService = new SettingService();
