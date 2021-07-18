@@ -401,16 +401,21 @@ class Ps_hesabfa extends Module
     // Order hooks
     public function hookActionValidateOrder($params)
     {
-        LogService::writeLogStr("====== hookActionValidateOrder ======, order id: " . $params['order']->id);
-        $invoiceService = new InvoiceService($this->id_default_lang);
-        $invoiceService->saveInvoice((int)$params['order']->id);
+        LogService::writeLogStr("====== hookActionValidateOrder ======");
+        $settingService = new SettingService();
+        if ($params["orderStatus"] == $settingService->getInWhichStatusAddInvoiceToHesabfa() ||
+            $settingService->getInWhichStatusAddInvoiceToHesabfa() == -1) {
+            $invoiceService = new InvoiceService($this->id_default_lang);
+            $invoiceService->saveInvoice((int)$params['order']->id);
+        }
     }
 
     public function hookActionPaymentConfirmation($params)
     {
         LogService::writeLogStr("====== hookActionPaymentConfirmation ======");
-
-        //$this->setOrderPayment($params['id_order']);
+        $receiptService = new ReceiptService();
+        $receiptService->saveReceipt();
+        // $this->setOrderPayment($params['id_order']);
     }
 
     public function hookActionOrderStatusPostUpdate($params)
@@ -423,7 +428,6 @@ class Ps_hesabfa extends Module
     public function hookActionOrderEdited($params)
     {
         LogService::writeLogStr("====== hookActionOrderEdited ======");
-
         $this->hookActionValidateOrder($params);
     }
 

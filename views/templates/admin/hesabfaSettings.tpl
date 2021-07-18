@@ -70,7 +70,7 @@
             <option {if $selectedInvoiceReference eq 1} selected {/if}>{l s='Order Reference' mod='ps_hesabfa'}</option>
         </select>
 
-        <label style="margin-top: 10px">{l s='In which statuses save invoice in Hesabfa' mod='ps_hesabfa'}</label>&nbsp;
+        <label style="margin-top: 10px">{l s='In which status save invoice in Hesabfa' mod='ps_hesabfa'}</label>&nbsp;
         <select class="form-control" id="hesabfa-setting-invoice-status" style="max-width: 250px">
             {foreach from=$orderStatusOptions item=i}
                 <option {if $selectedInvoiceStatus eq $i.id} selected {/if} value="{$i.id}">{$i.name}</option>
