@@ -33,6 +33,7 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ProductService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/CustomerService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/InvoiceService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/SettingService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ReceiptService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
 
 use Spatie\Async\Pool;
@@ -354,7 +355,6 @@ class Ps_hesabfa extends Module
         }
     }
 
-
     public function hookActionProductAttributeUpdate($params)
     {
         return;
@@ -413,9 +413,8 @@ class Ps_hesabfa extends Module
     public function hookActionPaymentConfirmation($params)
     {
         LogService::writeLogStr("====== hookActionPaymentConfirmation ======");
-        $receiptService = new ReceiptService();
-        $receiptService->saveReceipt();
-        // $this->setOrderPayment($params['id_order']);
+        $receiptService = new ReceiptService($this->id_default_lang);
+        $receiptService->saveReceipt($params['id_order']);
     }
 
     public function hookActionOrderStatusPostUpdate($params)
