@@ -78,6 +78,14 @@ interface ISettingService
 
     public function getHesabfaDefaultCurrency();
 
+    public function setConnectionStatus($value);
+
+    public function getConnectionStatus();
+
+    public function setGiftWrappingItemId($value);
+
+    public function getGiftWrappingItemId();
+
     public function setDefaultSettings();
 
     public function deleteAllSettings();
@@ -280,6 +288,26 @@ class SettingService implements ISettingService
     public function getHesabfaDefaultCurrency()
     {
         return $this->getSetting("DEFAULT_CURRENCY");
+    }
+
+    public function setConnectionStatus($value)
+    {
+        $this->setSetting("CONNECTED", $value);
+    }
+
+    public function getConnectionStatus()
+    {
+        return $this->getSetting("CONNECTED");
+    }
+
+    public function setGiftWrappingItemId($value)
+    {
+        $this->setSetting("GIFT_WRAPPING_ITEM_ID", $value);
+    }
+
+    public function getGiftWrappingItemId()
+    {
+        return $this->getSetting("GIFT_WRAPPING_ITEM_ID");
     }
 
     public function setDefaultSettings()

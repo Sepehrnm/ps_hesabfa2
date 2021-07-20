@@ -275,6 +275,7 @@ class Ps_hesabfa extends Module
 
         if ($result->Success) {
             $this->getAndSetHesabfaDefaultCurrency($settingService);
+            $this->setHesabfaWebhook();
             return (array("success" => true, "message" => $this->l("Connected to Hesabfa successfully.")));
         } else {
             return (array("success" => true, "message" => "Unable to connect to Hesabfa, error code: $result->ErrorCode, error message: $result->ErrorMessage"));
@@ -305,6 +306,65 @@ class Ps_hesabfa extends Module
         }
     }
 
+    public function setHesabfaWebhook()
+    {
+        $store_url = $this->context->link->getBaseLink();
+        $url = $store_url . 'modules/ps_hesabfa/hesabfa-webhook.php?token=' . Tools::substr(Tools::encrypt('hesabfa/webhook'), 0, 10);
+        $settingService = new SettingService();
+        $hookPassword = $settingService->getWebhookPassword();
+
+        $hesabfa = new HesabfaApiService($settingService);
+        $response = $hesabfa->settingSetChangeHook($url, $hookPassword);
+
+        if (is_object($response)) {
+            if ($response->Success) {
+                $settingService->setConnectionStatus(1);
+
+                //set the last log ID
+                $lastChange = $settingService->getLastChangesLogId();
+                if($lastChange == 0) {
+                    $changes = $hesabfa->settingGetChanges($lastChange);
+                    if ($changes->Success) {
+                            $lastChange = end($changes->Result);
+                            $settingService->setLastChangesLogId($lastChange->Id);
+                    } else {
+                        $msg = 'Cannot check the last change ID. Error Message: ' . $changes->ErrorMessage . ', Error Code: ' . $changes->ErrorCode;
+                        LogService::writeLogStr($msg);
+                    }
+                }
+
+                //set the Gift wrapping service id
+                if ($settingService->getGiftWrappingItemId() == 0) {
+                    $gift_wrapping = $hesabfa->itemSave(array(
+                        'Name' => 'Gift wrapping service',
+                        'ItemType' => 1,
+                        'Tag' => json_encode(array('id_product' => 0, 'id_attribute' => 0)),
+                    ));
+
+                    if ($gift_wrapping->Success) {
+                        $settingService->setGiftWrappingItemId($gift_wrapping->Result->Code);
+
+                        $msg = 'Hesabfa Gift wrapping service added successfully. Service Code: ' . $gift_wrapping->Result->Code;
+                        LogService::writeLogStr($msg);
+                    } else {
+                        $msg = 'Cannot set Gift wrapping service code. Error Message: ' . $gift_wrapping->ErrorMessage . ', Error Code: ' . $gift_wrapping->ErrorCode;
+                        LogService::writeLogStr($msg);
+                    }
+                }
+
+                $msg = 'Hesabfa webHook successfully Set. URL: ' . (string)$response->Result->url;
+                LogService::writeLogStr($msg);
+            } else {
+                $settingService->setConnectionStatus(0);
+                $msg = 'Cannot set Hesabfa webHook. Error Message: ' . $response->ErrorMessage . ', Error Code: ' . $response->ErrorCode;
+                LogService::writeLogStr($msg);
+            }
+        } else {
+            LogService::writeLogStr('Cannot set Hesabfa webHook. Please check your Internet connection');
+        }
+
+        return $response;
+    }
 
     /**
      * Add the CSS & JavaScript files you want to be loaded in the BO.

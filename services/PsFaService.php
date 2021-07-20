@@ -161,6 +161,15 @@ class PsFaService
         return true;
     }
 
+    public function update(PsFa $psFa) {
+        Db::getInstance()->update('ps_hesabfa', array(
+            'id_hesabfa' => $psFa->idHesabfa,
+            'obj_type' => $psFa->objType,
+            'id_ps' => (int)$psFa->idPs,
+            'id_ps_attribute' => (int)$psFa->idPsAttribute
+        ), array('id' => $psFa->id),0,true,true);
+    }
+
     public function delete($psFa) {
         Db::getInstance()->delete('ps_hesabfa', 'id=' . $psFa->id);
     }
