@@ -35,6 +35,7 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/InvoiceService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/SettingService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ReceiptService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/WebhookService.php');
 
 use Spatie\Async\Pool;
 
@@ -376,7 +377,7 @@ class Ps_hesabfa extends Module
             $this->context->controller->addCSS($this->_path . 'views/css/back.css');
         }
 
-        //$this->cronJob();
+         $this->cronJob();
     }
 
     /**
@@ -492,7 +493,27 @@ class Ps_hesabfa extends Module
 
     public function cronJob()
     {
-        LogService::writeLogStr("===== AAA =====");
+        $settingService = new SettingService();
+        $syncChangesLastDate = $settingService->getLastChangesCheckDate();
+        if(!isset($syncChangesLastDate) || $syncChangesLastDate == false)
+        {
+            $settingService->setLastChangesCheckDate((new DateTime())->format('Y-m-d H:i:s'));
+            $syncChangesLastDate = new DateTime();
+        } else {
+            try {
+                $syncChangesLastDate = new DateTime($syncChangesLastDate);
+            } catch (Exception $e) {
+            }
+        }
+
+        $nowDateTime = new DateTime();
+        $diff = $nowDateTime->diff($syncChangesLastDate);
+
+        if($diff->i > 0) {
+            LogService::writeLogStr('===== Sync Changes Automatically =====');
+            $settingService->setLastChangesCheckDate((new DateTime())->format('Y-m-d H:i:s'));
+            new WebhookService();
+        }
     }
 
 }

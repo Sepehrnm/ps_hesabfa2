@@ -86,6 +86,10 @@ interface ISettingService
 
     public function getGiftWrappingItemId();
 
+    public function setLastChangesCheckDate($value);
+
+    public function getLastChangesCheckDate();
+
     public function setDefaultSettings();
 
     public function deleteAllSettings();
@@ -308,6 +312,14 @@ class SettingService implements ISettingService
     public function getGiftWrappingItemId()
     {
         return $this->getSetting("GIFT_WRAPPING_ITEM_ID");
+    }
+
+    public function setLastChangesCheckDate($value) {
+        $this->setSetting("LAST_CHANGES_CHECK_DATE", $value);
+    }
+
+    public function getLastChangesCheckDate() {
+        return $this->getSetting("LAST_CHANGES_CHECK_DATE");
     }
 
     public function setDefaultSettings()

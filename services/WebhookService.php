@@ -4,6 +4,7 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/SettingsService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/LogService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/PsFaService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ProductService.php');
 
 class WebhookService
 {
@@ -57,7 +58,7 @@ class WebhookService
                 }
             }
 
-            //remove duplicate values
+            // remove duplicate values
             $this->invoiceItemsCode = array_unique($this->invoiceItemsCode);
             $this->contactsObjectId = array_unique($this->contactsObjectId);
             $this->itemsObjectId = array_unique($this->itemsObjectId);
@@ -145,6 +146,7 @@ class WebhookService
         if ($invoice->InvoiceType == 0) {
             //check if Tag not set in hesabfa
             if ($id_order == 0) {
+                return false;
             } else {
                 //check if order exist in prestashop
                 $psFa = $psFaService->getPsFa('order', $id_order);
@@ -164,6 +166,159 @@ class WebhookService
         return true;
     }
 
+    public function setContactChanges($contact)
+    {
+        if (!is_object($contact))
+            return false;
+
+        $psFaService = new PsFaService();
+
+        //1.set new Hesabfa Contact Code if changes
+        $code = $contact->Code;
+
+        $json = json_decode($contact->Tag);
+        if (is_object($json)) {
+            $id_customer = $json->id_customer;
+        } else {
+            $id_customer = 0;
+        }
+
+        //check if Tag not set in hesabfa
+        if ($id_customer == 0)
+            return false;
+
+        //check if customer exist in prestashop
+        $psFa = $psFaService->getPsFa('customer', $id_customer);
+        if ($psFa->id > 0) {
+            if ($psFa->idHesabfa != $code) {
+                $id_hesabfa_old = $psFa->idHesabfa;
+                $psFa->idHesabfa = (int)$code;
+                $psFaService->update($psFa);
+
+                $msg = 'Contact Code changed. Old ID: ' . $id_hesabfa_old . '. New ID: ' . $code . ', Customer code: ' . $id_customer;
+                LogService::writeLogStr($msg);
+            }
+        }
+
+        return true;
+    }
+
+    public static function setItemChanges($item)
+    {
+        if (!is_object($item))
+            return false;
+
+        $settingService = new SettingService();
+        $psFaService = new PsFaService();
+        $productService = new ProductService($settingService);
+
+        //do nothing if product is GiftWrapping item
+        if ($settingService->getGiftWrappingItemId() == $item->Code)
+            return true;
+
+        $id_product = 0;
+        $id_attribute = 0;
+
+        //set ids if set
+        $json = json_decode($item->Tag);
+        if (is_object($json)) {
+            $id_product = $json->id_product;
+            if (isset($json->id_attribute)) {
+                $id_attribute = $json->id_attribute;
+            }
+        }
+
+        //check if Tag not set in hesabfa
+        if ($id_product == 0)
+            return false;
+
+        $psFa = $psFaService->getPsFa('product', $id_product, $id_attribute);
+
+        if ($psFa->id > 0) {
+            //ToDo: if product not exists in PS then return
+            $product = new Product($id_product);
+
+            //1.set new Hesabfa Item Code if changes
+            if ($psFa->idHesabfa != (int)$item->Code) {
+                $id_hesabfa_old = $psFa->idHesabfa;
+                $psFa->idHesabfa = (int)$item->Code;
+                $psFaService->update($psFa);
+
+                $msg = 'Item Code changed. Old ID: ' . $id_hesabfa_old . '. New ID: ' . (int)$item->Code . ', Product id: ' . $id_product.'-'.$id_attribute;
+                LogService::writeLogStr($msg);
+            }
+
+            //2.set new Price
+            if ($settingService->getUpdatePriceFromHesabfaToStore()) {
+                if ($id_attribute != 0) {
+                    $combination = new Combination($id_attribute);
+                    $price = $productService->getPriceInHesabfaDefaultCurrency($product->price + $combination->price);
+                    if ($item->SellPrice != $price) {
+                        $old_price = $price;
+                        $combination->price = $productService->getPriceInPrestashopDefaultCurrency($item->SellPrice) - $product->price;
+                        $combination->update();
+
+                        $msg = "Item $id_product-$id_attribute price changed. Old Price: $old_price. New Price: $item->SellPrice, Product id: $id_product-$id_attribute";
+                        LogService::writeLogStr($msg);
+                    }
+                } else {
+                    $price = $productService->getPriceInHesabfaDefaultCurrency($product->price);
+                    if ($item->SellPrice != $price) {
+                        $old_price = $price;
+                        $product->price = $productService->getPriceInPrestashopDefaultCurrency($item->SellPrice);
+                        $product->update();
+
+                        $msg = "Item $id_product price changed. Old Price: $old_price. New Price: $item->SellPrice, Product id: $id_product";
+                        LogService::writeLogStr($msg);
+                    }
+                }
+            }
+
+            //3.set new Quantity
+            if ($settingService->getUpdateQuantityFromHesabfaToStore()) {
+                if ($id_attribute != 0) {
+                    $current_quantity = StockAvailable::getQuantityAvailableByProduct($id_product, $id_attribute);
+                    if ($item->Stock != $current_quantity) {
+                        StockAvailable::setQuantity($id_product, $id_attribute, $item->Stock);
+//                        StockAvailable::updateQuantity($id_product, $id_attribute, $item->Stock);
+
+                        //TODO: Check why this object not update the quantity
+//                        $combination = new Combination($id_attribute);
+//                        $combination->quantity = $item->Stock;
+//                        $combination->update();
+
+                        $sql = 'UPDATE `' . _DB_PREFIX_ . 'product_attribute`
+                                SET `quantity` = '. $item->Stock . '
+                                WHERE `id_product` = ' . $id_product . ' AND `id_product_attribute` = ' . $id_attribute;
+                        Db::getInstance()->execute($sql);
+
+                        $msg = "Item $id_product-$id_attribute quantity changed. Old qty: $current_quantity. New qty: $item->Stock, Product id: $id_product";
+                        LogService::writeLogStr($msg);
+                    }
+                } else {
+                    $current_quantity = StockAvailable::getQuantityAvailableByProduct($id_product);
+                    if ($item->Stock != $current_quantity) {
+                        StockAvailable::setQuantity($id_product, null, $item->Stock);
+//                        StockAvailable::updateQuantity($id_product, null, $item->Stock);
+
+                        //TODO: Check why this object not update the quantity
+//                    $product->quantity = $item->Stock;
+//                    $product->update();
+
+                        $sql = 'UPDATE `' . _DB_PREFIX_ . 'product`
+                                SET `quantity` = '. $item->Stock . '
+                                WHERE `id_product` = ' . $id_product;
+                        Db::getInstance()->execute($sql);
+
+                        $msg = "Item $id_product quantity changed. Old qty: $current_quantity. New qty: $item->Stock, Product id: $id_product";
+                        LogService::writeLogStr($msg);
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
     public function getObjectsByIdList($idList, $type) {
         $hesabfaApi = new HesabfaApiService(new SettingService());
@@ -206,5 +361,4 @@ class WebhookService
 
         return false;
     }
-
 }

@@ -176,6 +176,18 @@ class ProductService
         return $price;
     }
 
+    public static function getPriceInPrestashopDefaultCurrency($price)
+    {
+        if (!isset($price))
+            return false;
+
+        $settingService = new SettingService();
+
+        $currency = new Currency($settingService->getHesabfaDefaultCurrency());
+        $price /= $currency->conversion_rate;
+        return $price;
+    }
+
     public function deleteProduct($productId)
     {
         $psFaService = new PsFaService();
