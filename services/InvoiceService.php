@@ -177,7 +177,7 @@ class InvoiceService
 
     private function saveInvoiceProducts(Order $order)
     {
-        $productService = new ProductService($this->idLang);
+        $productService = new ProductService();
         $psFaService = new PsFaService();
         $items = array();
         $products = $order->getProducts();
@@ -226,7 +226,7 @@ class InvoiceService
         if (!isset($price) || !isset($order))
             return false;
         $price = $price * (int)$order->conversion_rate;
-        $productService = new ProductService($this->idLang);
+        $productService = new ProductService();
         $price = $productService->getPriceInHesabfaDefaultCurrency($price);
         return $price;
     }

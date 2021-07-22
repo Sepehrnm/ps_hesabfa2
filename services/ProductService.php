@@ -9,9 +9,9 @@ class ProductService
 {
     public $idLang;
 
-    public function __construct($idDefaultLang)
+    public function __construct()
     {
-        $this->idLang = $idDefaultLang;
+        $this->idLang = Configuration::get('PS_LANG_DEFAULT');
     }
 
     public function saveProducts($productIdArray)
@@ -245,5 +245,75 @@ class ProductService
         }
 
         $psFaService->delete($psFaObject);
+    }
+
+    public function exportProducts($batch, $totalBatch, $total, $updateCount)
+    {
+        LogService::writeLogStr("===== Export Products =====");
+        $psFaService = new PsFaService();
+
+        $result = array();
+        $result["error"] = false;
+        $rpp = 500;
+
+        if ($batch == 1) {
+            $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product`';
+            $total = (int)Db::getInstance()->getValue($sql);
+            $totalBatch = ceil($total / $rpp);
+        }
+
+        $offset = ($batch - 1) * $rpp;
+        $sql = "SELECT id_product FROM `" . _DB_PREFIX_ . "product` ORDER BY 'id_product' ASC LIMIT $offset,$rpp";
+        $products = Db::getInstance()->executeS($sql);
+        $items = array();
+
+        foreach ($products as $item) {
+            $id_product = (int)$item["id_product"];
+            $product = new Product($id_product);
+
+            // Set base product
+            $id_obj = $psFaService->getPsFaId('product', $id_product, 0);
+            if (!$id_obj) {
+                $hesabfaItem = $this->mapProduct($product, $id_product);
+                array_push($items, $hesabfaItem);
+                $updateCount++;
+            }
+
+            // Set variations
+            if ($product->hasAttributes() > 0) {
+                $variations = $product->getAttributesResume($this->idLang);
+                foreach ($variations as $variation) {
+                    $id_obj = $psFaService->getPsFaId('product', $id_product, $variation['id_product_attribute']);
+                    if (!$id_obj) {
+                        $hesabfaItem = $this->mapProductCombination($product, $variation, $id_product);
+                        array_push($items, $hesabfaItem);
+                        $updateCount++;
+                    }
+                }
+            }
+        }
+
+        LogService::writeLogObj($items[0]);
+        LogService::writeLogStr("================================");
+        LogService::writeLogObj($items[1]);
+
+        if (!empty($items)) {
+            $hesabfa = new HesabfaApiService(new SettingService());
+            $response = $hesabfa->itemBatchSave($items);
+            if ($response->Success) {
+                foreach ($response->Result as $item) {
+                    $psFaService->saveProduct($item);
+                }
+            } else {
+                LogService::writeLogStr("Cannot add bulk item. Error Message: " . (string)$response->ErrorMessage . ". Error Code: " . (string)$response->ErrorCode . ".");
+            }
+            sleep(2);
+        }
+
+        $result["batch"] = $batch;
+        $result["totalBatch"] = $totalBatch;
+        $result["total"] = $total;
+        $result["updateCount"] = $updateCount;
+        return $result;
     }
 }

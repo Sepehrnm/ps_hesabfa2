@@ -398,20 +398,20 @@ class Ps_hesabfa extends Module
             return;
         $this->hookProductUpdateCalled = true;
 
-        $productService = new ProductService($this->id_default_lang);
+        $productService = new ProductService();
         $productService->saveProducts(array($params["id_product"]));
     }
 
     public function hookActionProductDelete($params)
     {
-        $productService = new ProductService($this->id_default_lang);
+        $productService = new ProductService();
         $productService->deleteProduct($params["id_product"]);
     }
 
     public function hookActionObjectDeleteAfter($params)
     {
         if (is_a($params["object"], 'Combination')) {
-            $productService = new ProductService($this->id_default_lang);
+            $productService = new ProductService();
             $productService->deleteRemovedCombinationsOfProduct($params["object"]->id_product);
         }
     }
@@ -419,7 +419,7 @@ class Ps_hesabfa extends Module
     public function hookActionProductAttributeUpdate($params)
     {
         return;
-        $productService = new ProductService($this->id_default_lang);
+        $productService = new ProductService();
         $productService->saveProducts(array($params['product']->id));
 
         $pool = Pool::create();
@@ -509,7 +509,7 @@ class Ps_hesabfa extends Module
         $nowDateTime = new DateTime();
         $diff = $nowDateTime->diff($syncChangesLastDate);
 
-        if($diff->i > 0) {
+        if($diff->i > 5) {
             LogService::writeLogStr('===== Sync Changes Automatically =====');
             $settingService->setLastChangesCheckDate((new DateTime())->format('Y-m-d H:i:s'));
             new WebhookService();
