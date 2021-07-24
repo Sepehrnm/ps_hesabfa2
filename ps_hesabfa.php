@@ -435,27 +435,27 @@ class Ps_hesabfa extends Module
     // Customer hooks
     public function hookActionObjectCustomerAddAfter($params)
     {
-        $customerService = new CustomerService($this->id_default_lang);
+        $customerService = new CustomerService();
         $customerService->saveCustomer($params['object']->id);
     }
 
     public function hookActionCustomerAccountUpdate($params)
     {
-        $customerService = new CustomerService($this->id_default_lang);
+        $customerService = new CustomerService();
         $customerService->saveCustomer($params['customer']->id);
     }
 
     public function hookActionObjectAddressAddAfter($params)
     {
         if (Address::getFirstCustomerAddressId($params['object']->id_customer) == 0) {
-            $customerService = new CustomerService($this->id_default_lang);
+            $customerService = new CustomerService();
             $customerService->saveCustomer($params['object']->id_customer, $params['object']->id);
         }
     }
 
     public function hookActionObjectCustomerDeleteBefore($params)
     {
-        $customerService = new CustomerService($this->id_default_lang);
+        $customerService = new CustomerService();
         $customerService->deleteCustomer($params['object']->id);
     }
 

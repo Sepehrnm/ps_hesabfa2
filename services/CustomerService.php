@@ -9,9 +9,9 @@ class CustomerService
 {
     public $idLang;
 
-    public function __construct($idDefaultLang)
+    public function __construct()
     {
-        $this->idLang = $idDefaultLang;
+        $this->idLang = Configuration::get('PS_LANG_DEFAULT');
     }
 
     public function saveCustomer($customerId, $addressId = 0)
@@ -144,6 +144,60 @@ class CustomerService
         }
 
         $psFaService->delete($psFaObject);
+    }
+
+    public function exportCustomers($batch, $totalBatch, $total, $updateCount)
+    {
+        LogService::writeLogStr("===== Export Customers =====");
+        $psFaService = new PsFaService();
+
+        $result = array();
+        $result["error"] = false;
+        $rpp = 500;
+
+        if ($batch == 1) {
+            $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'customer`';
+            $total = (int)Db::getInstance()->getValue($sql);
+            $totalBatch = ceil($total / $rpp);
+        }
+
+        $offset = ($batch - 1) * $rpp;
+        $sql = "SELECT id_customer FROM `" . _DB_PREFIX_ . "customer` ORDER BY 'id_customer' ASC LIMIT $offset,$rpp";
+        $customers = Db::getInstance()->executeS($sql);
+        $contacts = array();
+
+        foreach ($customers as $customer) {
+            $id_customer = (int)$customer["id_customer"];
+            $customer = new Customer($id_customer);
+
+            $id_obj = $psFaService->getPsFaId('customer', $id_customer, 0);
+            if (!$id_obj) {
+                $hesabfaContact = $this->mapCustomer($customer, $id_customer);
+                array_push($contacts, $hesabfaContact);
+                $updateCount++;
+            }
+        }
+
+        if (!empty($contacts)) {
+            $hesabfa = new HesabfaApiService(new SettingService());
+            $response = $hesabfa->contactBatchSave($contacts);
+            if ($response->Success) {
+                foreach ($response->Result as $contact) {
+                    $psFaService->saveCustomer($contact);
+                }
+            } else {
+                $result["error"] = true;
+                $result["errorMessage"] = "Cannot add bulk customer. Error Message: " . (string)$response->ErrorMessage . ". Error Code: " . (string)$response->ErrorCode . ".";
+                LogService::writeLogStr($result["errorMessage"]);
+            }
+            sleep(2);
+        }
+
+        $result["batch"] = $batch;
+        $result["totalBatch"] = $totalBatch;
+        $result["total"] = $total;
+        $result["updateCount"] = $updateCount;
+        return $result;
     }
 
 }

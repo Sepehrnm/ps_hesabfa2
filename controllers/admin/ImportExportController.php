@@ -20,7 +20,7 @@ class ImportExportController extends ModuleAdminController
         $this->setTemplate('import_export.tpl');
     }
 
-    public function  ajaxProcessExportProducts() {
+    public function ajaxProcessExportProducts() {
         $batch = Tools::getValue('batch');
         $totalBatch = Tools::getValue('totalBatch');
         $total = Tools::getValue('total');
@@ -29,15 +29,29 @@ class ImportExportController extends ModuleAdminController
         $productService = new ProductService();
         $result = $productService->exportProducts($batch, $totalBatch, $total, $updateCount);
 
-        if ($result['error']) {
-            if ($updateCount === -1) {
-                $result["errorMessage"] = 'Nothing to export';
-            } else {
-                $result["errorMessage"] = 'Error while trying to export products';
-            }
-        }
+        die(Tools::jsonEncode($result));
+    }
 
-        //echo json_encode($result);
+    public function ajaxProcessExportProductsOpeningQuantity() {
+        $batch = Tools::getValue('batch');
+        $totalBatch = Tools::getValue('totalBatch');
+        $total = Tools::getValue('total');
+
+        $productService = new ProductService();
+        $result = $productService->exportProductsOpeningQuantity($batch, $totalBatch, $total);
+
+        die(Tools::jsonEncode($result));
+    }
+
+    public function ajaxProcessExportCustomers() {
+        $batch = Tools::getValue('batch');
+        $totalBatch = Tools::getValue('totalBatch');
+        $total = Tools::getValue('total');
+        $updateCount = Tools::getValue('updateCount');
+
+        $customerService = new CustomerService();
+        $result = $customerService->exportCustomers($batch, $totalBatch, $total, $updateCount);
+
         die(Tools::jsonEncode($result));
     }
 }

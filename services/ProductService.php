@@ -218,7 +218,7 @@ class ProductService
 
         foreach ($psFaObjects as $psFaObject) {
             $found = false;
-            if($psFaObject->idPsAttribute == 0)
+            if ($psFaObject->idPsAttribute == 0)
                 $found = true;
             foreach ($combinations as $combination) {
                 if ($combination["id_product_attribute"] == $psFaObject->idPsAttribute)
@@ -293,10 +293,6 @@ class ProductService
             }
         }
 
-        LogService::writeLogObj($items[0]);
-        LogService::writeLogStr("================================");
-        LogService::writeLogObj($items[1]);
-
         if (!empty($items)) {
             $hesabfa = new HesabfaApiService(new SettingService());
             $response = $hesabfa->itemBatchSave($items);
@@ -305,7 +301,9 @@ class ProductService
                     $psFaService->saveProduct($item);
                 }
             } else {
-                LogService::writeLogStr("Cannot add bulk item. Error Message: " . (string)$response->ErrorMessage . ". Error Code: " . (string)$response->ErrorCode . ".");
+                $result["error"] = true;
+                $result["errorMessage"] = "Cannot add bulk item. Error Message: " . (string)$response->ErrorMessage . ". Error Code: " . (string)$response->ErrorCode . ".";
+                LogService::writeLogStr($result["errorMessage"]);
             }
             sleep(2);
         }
@@ -316,4 +314,78 @@ class ProductService
         $result["updateCount"] = $updateCount;
         return $result;
     }
+
+    public function exportProductsOpeningQuantity($batch, $totalBatch, $total)
+    {
+        LogService::writeLogStr("===== Export Products Opening Quantity =====");
+        $psFaService = new PsFaService();
+
+        $result = array();
+        $result["error"] = false;
+        $rpp = 500;
+
+        if ($batch == 1) {
+            $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product`';
+            $total = (int)Db::getInstance()->getValue($sql);
+            $totalBatch = ceil($total / $rpp);
+        }
+
+        $offset = ($batch - 1) * $rpp;
+        $sql = "SELECT id_product FROM `" . _DB_PREFIX_ . "product` ORDER BY 'id_product' ASC LIMIT $offset,$rpp";
+        $products = Db::getInstance()->executeS($sql);
+        $items = array();
+
+        foreach ($products as $item) {
+            $id_product = (int)$item["id_product"];
+            $product = new Product($id_product);
+
+            if ($product->hasAttributes() == 0) {
+                $obj = $psFaService->getPsFa('product', $id_product, 0);
+                if ($obj != null) {
+                    $quantity = StockAvailable::getQuantityAvailableByProduct($item['id_product']);
+                    if (is_object($product) && is_object($obj) && $quantity > 0 && $product->price > 0) {
+                        array_push($items, array(
+                            'Code' => $obj->idHesabfa,
+                            'Quantity' => $quantity,
+                            'UnitPrice' => $this->getPriceInHesabfaDefaultCurrency($product->price),
+                        ));
+                    }
+                }
+            } else {
+                $variations = $product->getAttributesResume($this->idLang);
+                foreach ($variations as $variation) {
+                    $obj = $psFaService->getPsFa('product', $id_product, $variation['id_product_attribute']);
+                    if ($obj != null) {
+                        $quantity = StockAvailable::getQuantityAvailableByProduct($item['id_product'], $variation['id_product_attribute']);
+                        if (is_object($obj) && $quantity > 0 && $product->price + $variation['price'] > 0) {
+                            array_push($items, array(
+                                'Code' => $obj->idHesabfa,
+                                'Quantity' => $quantity,
+                                'UnitPrice' => $this->getPriceInHesabfaDefaultCurrency($product->price + $variation['price']),
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($items)) {
+            $hesabfa = new HesabfaApiService(new SettingService());
+            $response = $hesabfa->itemUpdateOpeningQuantity($items);
+            if ($response->Success) {
+                // continue
+            } else {
+                $result["error"] = true;
+                $result["errorMessage"] = "Cannot set Opening quantity. Error Message: " . (string)$response->ErrorMessage . ". Error Code: " . (string)$response->ErrorCode . ".";
+                LogService::writeLogStr($result["errorMessage"]);
+            }
+            sleep(2);
+        }
+
+        $result["batch"] = $batch;
+        $result["totalBatch"] = $totalBatch;
+        $result["total"] = $total;
+        return $result;
+    }
+
 }

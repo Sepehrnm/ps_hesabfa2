@@ -160,7 +160,7 @@ class InvoiceService
     private function saveInvoiceCustomer(Order $order)
     {
         $psFaService = new PsFaService();
-        $customerService = new CustomerService($this->idLang);
+        $customerService = new CustomerService();
         $settingService = new SettingService();
 
         $contactCode = $psFaService->getPsFaId('customer', $order->id_customer);
