@@ -35,7 +35,7 @@ class HesabfaSettingsController extends ModuleAdminController
         $order_states = OrderState::getOrderStates(Context::getContext()->language->id);
         array_push($orderStatusOptions, array(
             'id' => -1,
-            'name' => 'Save invoice in all statuses',
+            'name' => $this->l('Save in all statuses'),
         ));
         foreach ($order_states as $order_state) {
             array_push($orderStatusOptions, array(

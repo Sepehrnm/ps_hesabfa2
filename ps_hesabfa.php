@@ -150,6 +150,7 @@ class Ps_hesabfa extends Module
                 $this->context->smarty->assign('documentCredit', $result->Result->Credit);
                 $this->context->smarty->assign('tokenHesabfaSettings', Tools::getAdminTokenLite('HesabfaSettings'));
                 $this->context->smarty->assign('tokenImportExport', Tools::getAdminTokenLite('ImportExport'));
+                $this->context->smarty->assign('tokenSynchronization', Tools::getAdminTokenLite('Synchronization'));
             }
         }
 
@@ -464,8 +465,10 @@ class Ps_hesabfa extends Module
     {
         LogService::writeLogStr("====== hookActionValidateOrder ======");
         $settingService = new SettingService();
-        if ($params["orderStatus"] == $settingService->getInWhichStatusAddInvoiceToHesabfa() ||
-            $settingService->getInWhichStatusAddInvoiceToHesabfa() == -1) {
+        $settingStatus = $settingService->getInWhichStatusAddInvoiceToHesabfa();
+        //LogService::writeLogStr('order status: ' . (string)$params["orderStatus"]);
+
+        if ($settingStatus == -1 || $params["orderStatus"] == $settingStatus) {
             $invoiceService = new InvoiceService();
             $invoiceService->saveInvoice((int)$params['order']->id);
         }

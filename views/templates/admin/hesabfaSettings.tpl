@@ -54,7 +54,7 @@
         </select>
 
         <div class="form-group" style="margin-top: 10px;">
-            <label>Customers category name</label>
+            <label>{l s='Customers category name' mod='ps_hesabfa'}</label>
             <input type="text" class="form-control" id="hesabfa-setting-customer-category"
                    placeholder="Online store customers" value="{$customerCategoryName}" style="max-width: 250px">
         </div>
@@ -97,7 +97,7 @@
         </select>
 
         <p style="margin-top: 15px;">
-            Select in every Payment Method which bank should be affected.
+            {l s='Select in every Payment Method which bank should be affected.' mod='ps_hesabfa'}
         </p>
 
         {* loop for payment methods *}
