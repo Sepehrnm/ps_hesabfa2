@@ -162,22 +162,28 @@ class Ps_hesabfa extends Module
     public function createTabLink()
     {
         $tab = new Tab;
-        foreach (Language::getLanguages() as $lang) {
+        foreach (Language::getLanguages() as $lang)
             $tab->name[$lang['id_lang']] = $this->l('Hesabfa Plugin Settings');
-        }
         $tab->class_name = 'HesabfaSettings';
         $tab->module = $this->name;
         $tab->id_parent = (int)Tab::getIdFromClassName('ShopParameters');
         $tab->add();
 
         $tab2 = new Tab;
-        foreach (Language::getLanguages() as $lang) {
+        foreach (Language::getLanguages() as $lang)
             $tab2->name[$lang['id_lang']] = $this->l('Import Export Hesabfa');
-        }
         $tab2->class_name = 'ImportExport';
         $tab2->module = $this->name;
         $tab2->id_parent = (int)Tab::getIdFromClassName('ShopParameters');
         $tab2->add();
+
+        $tab3 = new Tab;
+        foreach (Language::getLanguages() as $lang)
+            $tab3->name[$lang['id_lang']] = $this->l('Synchronization with Hesabfa');
+        $tab3->class_name = 'Synchronization';
+        $tab3->module = $this->name;
+        $tab3->id_parent = (int)Tab::getIdFromClassName('ShopParameters');
+        $tab3->add();
 
         return true;
     }

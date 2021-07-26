@@ -7,6 +7,7 @@ $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_98e2c63c9d8fa659d52b3270ccf4309a'] 
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_9eaa3334a7923727e7890ff5b4eb7276'] = 'آیا از حذف ماژول حسابفا مطمئن هستید؟ دقت کنید که با حذف ماژول جدول ارتباطات بین ماژول و حسابفا نیز حذف خواهد شد و تمامی ارتباطات از بین می رود.';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_30ccbc8199c7fd9aac00e93ce8f27612'] = 'تنظیمات پلاگین حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_270582a631d76769c67f905059289e24'] = 'ورود/خروج حسابفا';
+$_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_afc6ccae5e0a0863f258787d8d02ff2c'] = 'همسان سازی با حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_cec2ab5f5e872165e2fadfe47ad6caf5'] = 'تنظیمات API';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_52eb29f924066488e71300395b784ad5'] = 'کلید API حسابفا را وارد کنید';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_d876ff8da67c3731ae25d8335a4168b4'] = 'کلید API';
