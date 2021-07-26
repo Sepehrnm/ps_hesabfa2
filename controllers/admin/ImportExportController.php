@@ -1,6 +1,7 @@
 <?php
 
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ProductService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/CustomerService.php');
 
 class ImportExportController extends ModuleAdminController
 {
@@ -51,6 +52,19 @@ class ImportExportController extends ModuleAdminController
 
         $customerService = new CustomerService();
         $result = $customerService->exportCustomers($batch, $totalBatch, $total, $updateCount);
+
+        die(Tools::jsonEncode($result));
+    }
+
+    public function ajaxProcessExportOrders() {
+        $batch = Tools::getValue('batch');
+        $totalBatch = Tools::getValue('totalBatch');
+        $total = Tools::getValue('total');
+        $updateCount = Tools::getValue('updateCount');
+        $date = Tools::getValue('date');
+
+        $invoiceService = new InvoiceService();
+        $result = $invoiceService->exportOrders($batch, $totalBatch, $total, $updateCount, $date);
 
         die(Tools::jsonEncode($result));
     }

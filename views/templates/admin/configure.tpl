@@ -23,6 +23,10 @@ import them to the plugin’s settings. Now your module is ready to use.' mod='p
 			<i class="icon-exchange" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Import And Export' mod='ps_hesabfa'}</a>
 
+		<a href="?controller=Synchronization&token={$tokenSynchronization}" class="btn btn-info">
+			<i class="icon-refresh" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
+			{l s='Synchronization' mod='ps_hesabfa'}</a>
+
 		<a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank" class="btn btn-warning">
 			<i class="icon-question" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Plugin Help' mod='ps_hesabfa'}</a>

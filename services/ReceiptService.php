@@ -9,9 +9,9 @@ class ReceiptService
 {
     public $idLang;
 
-    public function __construct($idDefaultLang)
+    public function __construct()
     {
-        $this->idLang = $idDefaultLang;
+        $this->idLang = Configuration::get('PS_LANG_DEFAULT');
     }
 
     public function saveReceipt($id_order) {
@@ -19,7 +19,7 @@ class ReceiptService
             return false;
 
         $hesabfaApi = new HesabfaApiService(new SettingService());
-        $invoiceService = new InvoiceService($this->idLang);
+        $invoiceService = new InvoiceService();
         $psFaService = new PsFaService();
         $invoiceNumber = $psFaService->getInvoiceCodeByPrestaId((int)$id_order);
 

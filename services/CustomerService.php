@@ -148,7 +148,7 @@ class CustomerService
 
     public function exportCustomers($batch, $totalBatch, $total, $updateCount)
     {
-        LogService::writeLogStr("===== Export Customers =====");
+        LogService::writeLogStr("===== Export Customers: part $batch =====");
         $psFaService = new PsFaService();
 
         $result = array();

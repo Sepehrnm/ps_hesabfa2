@@ -6,14 +6,15 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/CustomerService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ProductService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/PsFaService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ReceiptService.php');
 
 class InvoiceService
 {
     public $idLang;
 
-    public function __construct($idDefaultLang)
+    public function __construct()
     {
-        $this->idLang = $idDefaultLang;
+        $this->idLang = Configuration::get('PS_LANG_DEFAULT');
     }
 
     public function saveInvoice($orderId, $orderType = 0, $reference = null)
@@ -229,6 +230,100 @@ class InvoiceService
         $productService = new ProductService();
         $price = $productService->getPriceInHesabfaDefaultCurrency($price);
         return $price;
+    }
+
+    public function exportOrders($batch, $totalBatch, $total, $updateCount, $from_date)
+    {
+        LogService::writeLogStr("===== Export Orders =====");
+
+        $result = array();
+        $result["error"] = false;
+        $rpp = 10;
+
+        if (!isset($from_date) || empty($from_date)) {
+            $result['error'] = true;
+            $result['errorMessage'] = 'Error: Enter correct date.';
+            return $result;
+        }
+
+        if (!$this->isDateInFiscalYear($from_date)) {
+            $result['error'] = true;
+            $result['errorMessage'] = 'Error: Selected date is not in Hesabfa financial year.';
+            return $result;
+        }
+
+        if ($batch == 1) {
+            $sql = "SELECT COUNT(*) FROM `" . _DB_PREFIX_ . "orders` WHERE date_add >= '" . $from_date . "'";
+            $total = (int)Db::getInstance()->getValue($sql);
+            $totalBatch = ceil($total / $rpp);
+        }
+
+        $offset = ($batch - 1) * $rpp;
+        $sql = "SELECT id_order FROM `" . _DB_PREFIX_ . "orders`
+                                WHERE date_add >= '" . $from_date . "'
+                                ORDER BY id_order ASC LIMIT $offset,$rpp";
+        $orders = Db::getInstance()->executeS($sql);
+
+        // implement below
+        $settingService = new SettingService();
+        $psFaService = new PsFaService();
+        $receiptService = new ReceiptService();
+
+        $statusToSubmitInvoice = $settingService->getInWhichStatusAddInvoiceToHesabfa();
+        $statusToSubmitReturnInvoice = $settingService->getInWhichStatusAddReturnInvoiceToHesabfa();
+        $statusToSubmitPayment = $settingService->getInWhichStatusAddPaymentReceipt();
+
+        //$id_orders = array();
+        foreach ($orders as $orderDbRow) {
+            $order = new Order($orderDbRow["id_order"]);
+            $id_order = $orderDbRow["id_order"];
+
+            $psFa = $psFaService->getPsFa('order', $id_order);
+            $current_status = $order->current_state;
+
+            if (!$psFa) {
+                if ($statusToSubmitInvoice == -1 || $statusToSubmitInvoice == $current_status) {
+                    if ($this->saveInvoice($id_order)) {
+                        //array_push($id_orders, $id_order);
+                        $updateCount++;
+
+                        if ($statusToSubmitPayment == -1 || $statusToSubmitPayment == $current_status)
+                            $receiptService->saveReceipt($id_order);
+
+                        // set return invoice
+                        if ($statusToSubmitReturnInvoice == $current_status) {
+                            $psFa = $psFaService->getPsFa('order', $id_order);
+                            $this->saveInvoice($id_order, 2, $psFa->idHesabfa);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        $result["batch"] = $batch;
+        $result["totalBatch"] = $totalBatch;
+        $result["total"] = $total;
+        $result["updateCount"] = $updateCount;
+        return $result;
+    }
+
+    public function isDateInFiscalYear($date)
+    {
+        $hesabfaApi = new HesabfaApiService(new SettingService());
+        $fiscalYear = $hesabfaApi->settingGetFiscalYear();
+
+        if ($fiscalYear->Success) {
+            $fiscalYearStartTimeStamp = strtotime($fiscalYear->Result->StartDate);
+            $fiscalYearEndTimeStamp = strtotime($fiscalYear->Result->EndDate);
+            $dateTimeStamp = strtotime($date);
+
+            if ($dateTimeStamp >= $fiscalYearStartTimeStamp && $dateTimeStamp <= $fiscalYearEndTimeStamp) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 
 }

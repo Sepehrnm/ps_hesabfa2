@@ -4,6 +4,7 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/LogService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/SettingsService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/PsFaService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/WebhookService.php');
 
 class ProductService
 {
@@ -249,7 +250,7 @@ class ProductService
 
     public function exportProducts($batch, $totalBatch, $total, $updateCount)
     {
-        LogService::writeLogStr("===== Export Products =====");
+        LogService::writeLogStr("===== Export Products: part $batch =====");
         $psFaService = new PsFaService();
 
         $result = array();
@@ -317,7 +318,7 @@ class ProductService
 
     public function exportProductsOpeningQuantity($batch, $totalBatch, $total)
     {
-        LogService::writeLogStr("===== Export Products Opening Quantity =====");
+        LogService::writeLogStr("===== Export Products Opening Quantity: part $batch =====");
         $psFaService = new PsFaService();
 
         $result = array();
@@ -387,5 +388,52 @@ class ProductService
         $result["total"] = $total;
         return $result;
     }
+
+    public function syncProductsPriceAndQuantity($batch, $totalBatch, $total) {
+        LogService::writeLogStr("===== Sync products price and quantity from hesabfa to store: part $batch =====");
+        $result = array();
+        $result["error"] = false;
+
+        $hesabfa = new HesabfaApiService(new SettingService());
+        $filters = array(array("Property" => "Tag", "Operator" => "!=", "Value" => ""),
+            array("Property" => "ItemType", "Operator" => "=", "Value" => 0));
+        $rpp = 500;
+
+        if ($batch == 1) {
+            $total = 0;
+            $response = $hesabfa->itemGetItems(array('Take' => 1, 'Filters' => $filters));
+            if ($response->Success) {
+                $total = $response->Result->FilteredCount;
+                $totalBatch = ceil($total / $rpp);
+            } else {
+                $result["error"] = true;
+                $result["errorMessage"] = "Error while trying to get products for sync. Error Message: $response->ErrorMessage. Error Code: $response->ErrorCode.";
+                LogService::writeLogStr($result["errorMessage"]);
+                return $result;
+            };
+        }
+
+        $offset = ($batch - 1) * $rpp;
+        $response = $hesabfa->itemGetItems(array('Skip' => $offset, 'Take' => $rpp, 'SortBy' => 'Id', 'Filters' => $filters));
+        if ($response->Success) {
+            $products = $response->Result->List;
+            foreach ($products as $product) {
+                WebhookService::setItemChanges($product);
+            }
+            sleep(1);
+        } else {
+            $result["error"] = true;
+            $result["errorMessage"] = "Error while trying to get products for sync. Error Message: $response->ErrorMessage. Error Code: $response->ErrorCode.";
+            LogService::writeLogStr($result["errorMessage"]);
+            return $result;
+        }
+
+        $result["batch"] = $batch;
+        $result["totalBatch"] = $totalBatch;
+        $result["total"] = $total;
+        return $result;
+    }
+
+
 
 }

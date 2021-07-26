@@ -143,9 +143,9 @@ class PsFaService
                 'id_ps' => (int)$json->id_order,
             ));
             if($objType == 'order')
-                LogService::writeLogStr("Invoice successfully added. invoice number: " . (string)$invoice->Number);
+                LogService::writeLogStr("Invoice successfully added. invoice number: " . (string)$invoice->Number . ", order id: " . $json->id_order);
             else
-                LogService::writeLogStr("Return Invoice successfully added. Customer code: " . (string)$invoice->Number);
+                LogService::writeLogStr("Return Invoice successfully added. Customer code: " . (string)$invoice->Number . ", order id: " . $json->id_order);
         } else {
             Db::getInstance()->update('ps_hesabfa', array(
                 'id_hesabfa' => $invoiceNumber,
@@ -153,9 +153,9 @@ class PsFaService
                 'id_ps' => (int)$json->id_order,
             ), array('id' => $id),0,true,true);
             if($objType == 'order')
-                LogService::writeLogStr("Invoice successfully updated. invoice number: " . (string)$invoice->Number);
+                LogService::writeLogStr("Invoice successfully updated. invoice number: " . (string)$invoice->Number . ", order id: " . $json->id_order);
             else
-                LogService::writeLogStr("Return Invoice successfully updated. Customer code: " . (string)$invoice->Number);
+                LogService::writeLogStr("Return Invoice successfully updated. Customer code: " . (string)$invoice->Number . ", order id: " . $json->id_order);
         }
 
         return true;

@@ -466,7 +466,7 @@ class Ps_hesabfa extends Module
         $settingService = new SettingService();
         if ($params["orderStatus"] == $settingService->getInWhichStatusAddInvoiceToHesabfa() ||
             $settingService->getInWhichStatusAddInvoiceToHesabfa() == -1) {
-            $invoiceService = new InvoiceService($this->id_default_lang);
+            $invoiceService = new InvoiceService();
             $invoiceService->saveInvoice((int)$params['order']->id);
         }
     }
@@ -474,14 +474,14 @@ class Ps_hesabfa extends Module
     public function hookActionPaymentConfirmation($params)
     {
         LogService::writeLogStr("====== hookActionPaymentConfirmation ======");
-        $receiptService = new ReceiptService($this->id_default_lang);
+        $receiptService = new ReceiptService();
         $receiptService->saveReceipt($params['id_order']);
     }
 
     public function hookActionOrderStatusPostUpdate($params)
     {
         LogService::writeLogStr("====== hookActionOrderStatusPostUpdate ======");
-        $invoiceService = new InvoiceService($this->id_default_lang);
+        $invoiceService = new InvoiceService();
         $invoiceService->saveReturnInvoice($params['id_order'], $params['newOrderStatus']->id);
     }
 

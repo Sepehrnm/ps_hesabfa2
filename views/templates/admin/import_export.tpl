@@ -80,11 +80,56 @@
     <button class="btn btn-primary" id="hesabfa_export_customers">{l s='Export customers' mod='ps_hesabfa'}</button>
 </div>
 
+<div class="panel">
+    <div class="panel-heading">
+        {l s='Export orders to Hesabfa' mod='ps_hesabfa'}
+    </div>
+    <div class="panel-body">
+        <p class="hesabfa-p mt-2">{l s='Export online store orders to Hesabfa as Invoice' mod='ps_hesabfa'}</p>
+        <div class="progress mt-1 mb-2" style="height: 5px; max-width: 400px; border: 1px solid silver"
+             id="exportOrdersProgress">
+            <div class="progress-bar progress-bar-striped bg-success" id="exportOrdersProgressBar"
+                 role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0"
+                 aria-valuemax="100"></div>
+        </div>
+        <div class="p-2 hesabfa-f">
+            <label class="fw-bold mb-2">نکات مهم:</label>
+            <ul>
+                <li>با انجام این عملیات سفارشات فروشگاه که در حسابفا ثبت نشده اند از تاریخ انتخاب شده بررسی و در
+                    حسابفا ثبت می شوند.
+                </li>
+                <li>توجه کنید که بصورت نرمال با فعالسازی افزونه و تکمیل تنظیمات API
+                    این همسان سازی بصورت خودکار انجام می شود و این گزینه صرفاْ برای مواقعی است که به دلایل فنی
+                    مثل قطع اتصال فروشگاه با حسابفا و یا خطا و باگ این همسان سازی صورت نگرفته است.
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <div class="input-group" style="max-width: 150px;">
+        <input class="datetimepicker" type="text" id="hesabfa_sync_order_date" name="hesabfa_sync_order_date">
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $(".datetimepicker").datepicker({
+                    prevText: '',
+                    nextText: '',
+                    dateFormat: 'yy-mm-dd'
+                });
+            });
+        </script>
+        <span class="input-group-addon">
+                                    <i class="icon-calendar-empty"></i>
+                                </span>
+    </div>
+    <button class="btn btn-primary" id="hesabfa_export_orders" style="margin-top: 5px;">{l s='Export orders' mod='ps_hesabfa'}</button>
+</div>
+
 <script>
     jQuery(function ($) {
         $('#exportProductsProgress').hide();
         $('#exportCustomersProgress').hide();
         $('#exportProductsOpeningQuantityProgress').hide();
+        $('#exportOrdersProgress').hide();
 
         $('#hesabfa_export_products').click(function () {
             $('#hesabfa_export_products').prop('disabled', true);
@@ -241,5 +286,59 @@
                 }
             });
         }
+
+        $('#hesabfa_export_orders').click(function () {
+            $('#hesabfa_export_orders').prop('disabled', true);
+            $('#exportOrdersProgress').show();
+            $('#exportOrdersProgressBar').css('width', 0 + '%').attr('aria-valuenow', 0);
+            exportOrders(1, 1, 1, 0);
+            return false;
+        });
+        function exportOrders(batch, totalBatch, total, updateCount) {
+            const data = {
+                'ajax': true,
+                'controller': 'ImportExport',
+                'action': 'exportOrders',
+                'batch': batch,
+                'totalBatch': totalBatch,
+                'total': total,
+                'updateCount': updateCount,
+                'token': token,
+                'date': $('#hesabfa_sync_order_date').val()
+            };
+            $.post('index.php', data, function (response) {
+                if (response !== 'failed') {
+                    const res = JSON.parse(response);
+
+                    if(res.error) {
+                        alert(res.errorMessage);
+                        $('#exportOrdersProgress').hide();
+                        $('#hesabfa_export_orders').prop('disabled', false);
+                        return false;
+                    }
+
+                    res.batch = parseInt(res.batch);
+                    if (res.batch < res.totalBatch) {
+                        let progress = (res.batch * 100) / res.totalBatch;
+                        progress = Math.round(progress);
+                        $('#exportOrdersProgressBar').css('width', progress + '%').attr('aria-valuenow', progress);
+                        exportOrders(res.batch + 1, res.totalBatch, res.total, res.updateCount);
+                        return false;
+                    } else {
+                        $('#exportOrdersProgressBar').css('width', 100 + '%').attr('aria-valuenow', 100);
+                        setTimeout(() => {
+                            $('#exportOrdersProgress').hide();
+                            $('#hesabfa_export_orders').prop('disabled', false);
+                            alert('Export orders finished successfully. total orders exported: ' + res.updateCount);
+                        }, 1000);
+                        return false;
+                    }
+                } else {
+                    alert('Error exporting orders.');
+                    return false;
+                }
+            });
+        }
+
     });
 </script>
