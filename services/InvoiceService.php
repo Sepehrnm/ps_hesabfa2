@@ -326,4 +326,22 @@ class InvoiceService
         return false;
     }
 
+    public function clearLink($orderId) {
+        $psFaService = new PsFaService();
+        $psFa = $psFaService->getPsFa('order', $orderId);
+        if($psFa)
+            $psFaService->delete($psFa);
+
+        $hesabfaApiService = new HesabfaApiService(new SettingService());
+        $response = $hesabfaApiService->invoiceClearTag(array($orderId));
+
+        if ($response->Success) {
+            LogService::writeLogStr("Order link with hesabfa invoice removed. order id: $orderId, invoice number: " . ($psFa ? $psFa->idHesabfa : ''));
+            return true;
+        } else {
+            LogService::writeLogStr("Cannot remove order link with hesabfa invoice. Error Code: " . (string)$response->ErrorCode . ". Error Message: $response->ErrorMessage.");
+            return false;
+        }
+    }
+
 }

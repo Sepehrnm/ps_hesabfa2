@@ -58,6 +58,8 @@ class HesabfaApiService implements IHesabfaApiService
 
         $data_string = json_encode($data);
 
+        //LogService::writeLogObj($data_string);
+
         if ($this->settingService->getDebugMode()) {
             PrestaShopLogger::addLog('ssbhesabfa - Method:' . $method . ' - DataString: ' . serialize($data_string), 1, null, null, null, true);
 //            var_dump('ssbhesabfa - Method:' . $method . ' - DataString: ' .$data_string);
@@ -191,6 +193,16 @@ class HesabfaApiService implements IHesabfaApiService
         return $this->apiRequest($method, $data);
     }
 
+    public function contactClearTag($codeList)
+    {
+        $method = 'contact/clearTag';
+        $data = array(
+            'codes' => $codeList,
+        );
+
+        return $this->apiRequest($method, $data);
+    }
+
     //Items functions
     public function itemGet($code)
     {
@@ -272,6 +284,16 @@ class HesabfaApiService implements IHesabfaApiService
         return $this->apiRequest($method, $data);
     }
 
+    public function itemClearTag($codeList)
+    {
+        $method = 'item/clearTag';
+        $data = array(
+            'codes' => $codeList,
+        );
+
+        return $this->apiRequest($method, $data);
+    }
+
     //Invoice functions
     public function invoiceGet($number, $type = 0)
     {
@@ -347,6 +369,17 @@ class HesabfaApiService implements IHesabfaApiService
         $data = array(
             'number' => $number,
             'type' => $type,
+        );
+
+        return $this->apiRequest($method, $data);
+    }
+
+    public function invoiceClearTag($numberList, $type = 0)
+    {
+        $method = 'invoice/clearTag';
+        $data = array(
+            'numbers' => $numberList,
+            'type' => $type
         );
 
         return $this->apiRequest($method, $data);

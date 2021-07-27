@@ -101,6 +101,8 @@ class Ps_hesabfa extends Module
             $this->registerHook('actionOrderStatusPostUpdate') &&
             $this->registerHook('actionOrderEdited') &&
 
+            $this->registerHook('displayAdminOrderTabContent') &&
+
             $this->createTabLink();
     }
 
@@ -523,6 +525,17 @@ class Ps_hesabfa extends Module
             $settingService->setLastChangesCheckDate((new DateTime())->format('Y-m-d H:i:s'));
             new WebhookService();
         }
+    }
+
+    public function hookDisplayAdminOrderTabContent($params) {
+        $psFaService = new PsFaService();
+        $psFa = $psFaService->getPsFa('order', $params["id_order"]);
+        $this->context->smarty->assign('invoiceNumber', $psFa ? $psFa->idHesabfa : 0);
+        $this->context->smarty->assign('orderId', $params["id_order"]);
+        $this->context->smarty->assign('tokenHesabfaWidgets', Tools::getAdminTokenLite('HesabfaWidgets'));
+
+        $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/order-widget.tpl');
+        return $output;
     }
 
 }

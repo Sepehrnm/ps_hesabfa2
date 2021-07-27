@@ -68,6 +68,12 @@ $_MODULE['<{ps_hesabfa}prestashop>import_export_4713ef5f2d6fc1e8f088c850e696a04b
 $_MODULE['<{ps_hesabfa}prestashop>import_export_672f1a2fc5cfc7327a67a91c43f8d4e3'] = 'صدور سفارش ها به حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_70c2a18e121eceddde27741964531c06'] = 'صدور سفارش های فروشگاه آنلاین به حسابفا بعنوان فاکتور فروش';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_da8cbc8f80b433d3d2b6d13eea457873'] = 'صدور سفارش ها';
+$_MODULE['<{ps_hesabfa}prestashop>order-widget_60198ebb04e62528fac37eac11d40c68'] = 'حسابفا';
+$_MODULE['<{ps_hesabfa}prestashop>order-widget_492226212a068302409145a4db451651'] = 'شماره فاکتور در حسابفا';
+$_MODULE['<{ps_hesabfa}prestashop>order-widget_def84554cc3afa3214c9068e05646974'] = 'فاکتور در حسابفا ثبت نشده است';
+$_MODULE['<{ps_hesabfa}prestashop>order-widget_05a97112aca244cf1d2436e1b1b45d65'] = 'ذخیره فاکتور';
+$_MODULE['<{ps_hesabfa}prestashop>order-widget_cc2e3984fb85a5de3f9f6246d67bedd6'] = 'ذخیره رسید';
+$_MODULE['<{ps_hesabfa}prestashop>order-widget_4d6fdfecf28422833b7f70d506088a67'] = 'حذف لینک با حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>synchronization_6027e974dd223262cac5fbf750f1c81c'] = 'همسان سازی قیمت و موجودی محصولات';
 $_MODULE['<{ps_hesabfa}prestashop>synchronization_a53da78cfbbf0976199a10143ecb5117'] = 'همسان سازی قیمت و موجودی محصولات در فروشگاه آنلاین بر اساس حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>synchronization_cde5429dbfd8a853fb33c58da02cea9a'] = 'همسان سازی محصولات';
