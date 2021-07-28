@@ -48,7 +48,7 @@ class Ps_hesabfa extends Module
     {
         $this->name = 'ps_hesabfa';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '2.0.0';
         $this->author = 'Hesabfa';
         $this->need_instance = 0;
 
@@ -111,6 +111,9 @@ class Ps_hesabfa extends Module
         $settingService = new SettingService();
         $settingService->deleteAllSettings();
 
+        $hesabfaApiService = new HesabfaApiService($settingService);
+        $hesabfaApiService->fixClearTags();
+
         include(dirname(__FILE__) . '/sql/uninstall.php');
 
         return parent::uninstall();
@@ -125,6 +128,7 @@ class Ps_hesabfa extends Module
          * If values have been submitted in the form, process.
          */
         $output = '';
+        $needUpdate = false;
 
         if (((bool)Tools::isSubmit('submitPs_hesabfaModule')) == true) {
             $result = $this->postProcess();
@@ -154,7 +158,41 @@ class Ps_hesabfa extends Module
                 $this->context->smarty->assign('tokenImportExport', Tools::getAdminTokenLite('ImportExport'));
                 $this->context->smarty->assign('tokenSynchronization', Tools::getAdminTokenLite('Synchronization'));
             }
+
+            $updateInfo = $apiService->checkForModuleUpdateInfo();
+            if ($updateInfo) {
+                $latest_version = $updateInfo["latest_version"];
+                $notices = $updateInfo["notice"];
+
+                if ($latest_version && strpos($latest_version, '.') != false) {
+                    if (Tools::version_compare($this->version, $latest_version)) {
+                        $this->context->smarty->assign('needUpdate', true);
+                        $this->context->smarty->assign('latestVersion', $latest_version);
+                        $updateText = sprintf($this->l('A new version (%s) is available.'), $latest_version);
+                        $output .= $this->displayConfirmation($updateText);
+                    }
+                }
+
+                if ($notices) {
+                    foreach ($notices as $val) {
+                        if (!isset($val['text']) || !$val['text']) {
+                            continue;
+                        }
+                        if ($val['type'] == 'error') {
+                            $output .= $this->displayError($val['text']);
+                        } elseif ($val['type'] == 'info') {
+                            $output .= $this->displayConfirmation($val['text']);
+                        } else {
+                            $output .= $val['text'];
+                        }
+                    }
+                }
+            }
         }
+
+        $this->context->smarty->assign(array(
+            'need_update' => $needUpdate,
+        ));
 
         $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
 

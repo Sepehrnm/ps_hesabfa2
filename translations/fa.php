@@ -5,6 +5,7 @@ $_MODULE = array();
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_60198ebb04e62528fac37eac11d40c68'] = 'حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_98e2c63c9d8fa659d52b3270ccf4309a'] = 'نرم افزار حسابداری آنلاین حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_9eaa3334a7923727e7890ff5b4eb7276'] = 'آیا از حذف ماژول حسابفا مطمئن هستید؟ دقت کنید که با حذف ماژول جدول ارتباطات بین ماژول و حسابفا نیز حذف خواهد شد و تمامی ارتباطات از بین می رود.';
+$_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_d5884184a8909ae589aace1219a5d5de'] = 'یک نسخه جدید از افزونه (%s) در دسترس است.';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_30ccbc8199c7fd9aac00e93ce8f27612'] = 'تنظیمات پلاگین حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_270582a631d76769c67f905059289e24'] = 'ورود/خروج حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_afc6ccae5e0a0863f258787d8d02ff2c'] = 'همسان سازی با حسابفا';
@@ -17,6 +18,9 @@ $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_c9cc8cce247e49bae79f15173ce97354'] 
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettingscontroller_cb7d4cc6fcbd6660886ad65206b59215'] = 'ذخیره در تمام وضعیت ها';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettingscontroller_225dcbfbd01e60b2dd39ba1a7044ee9b'] = 'انتخاب نشده';
 $_MODULE['<{ps_hesabfa}prestashop>invoiceservice_1a4a61c0830c32baf0c535a61fe72566'] = 'خدمات کادو پیچی';
+$_MODULE['<{ps_hesabfa}prestashop>configure_32f2466905e655f6b7e302b89a8e095e'] = 'ارتقا به نسخه جدید';
+$_MODULE['<{ps_hesabfa}prestashop>configure_9ba946e29053392cf879a805b271a20f'] = 'یک نسخه جدید از افزونه در دسترس است و ما قویاً توصیه می کنیم قبل از ادامه کار با افزونه آن را به آخرین نسخه ارتقا دهید. برای ارتقای افزونه به نسخه جدید ابتدا از لینک زیر آن را دانلود کنید و سپس بر روی نسخه قبل نصب نمایید (بدون حذف نسخه قبل).';
+$_MODULE['<{ps_hesabfa}prestashop>configure_9bfb68c3d18c8e2302f048b70069eedd'] = 'دانلود نسخه جدید افزونه';
 $_MODULE['<{ps_hesabfa}prestashop>configure_0cb57df2a2fbbf2d45ff66ba9d5e7b29'] = 'افزونه نرم افزار حسابداری آنلاین حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>configure_eee8b134630a42e1f1b9ea29beb68284'] = 'این افزونه فروشگاه شما را به نرم افزار حسابداری آنلاین حسابفا متصل می کند. به وسیله ی این افزونه کالاها، مشتریان و سفارشات شما به محض ثبت در فروشگاه، در حسابفا نیز بصورت خودکار ثبت و ذخیره می شوند. همچنین با پرداخت مشتری، سند دریافت وجه از مشتری نیز در حسابفا ثبت می شود. بدیهی است برای استفاده از این افزونه باید ابتدا یک حساب کاربری در حسابفا داشته باشید. برای این کار می توانید به وب سایت حسابفا به آدرس www.hesabfa.com سر بزنید و به رایگان ثبت نام کنید. پس از ثبت نام در حسابفا و ورود به حساب خود، و سپس ورود به یک کسب و کار، در قسمت تنظیمات / API می توانید کلید API مربوط به کسب و کار خود را دریافت و در قسمت تنظیمات این افزونه وارد نمایید. پس از آن ماژول شما آماده استفاده است.';
 $_MODULE['<{ps_hesabfa}prestashop>configure_e7a95fb358e6d9a6f50a54f163e36781'] = 'تنظیمات افزونه';

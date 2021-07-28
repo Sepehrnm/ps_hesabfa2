@@ -1,3 +1,17 @@
+{if $needUpdate eq true}
+	<div class="panel">
+		<h3><i class="icon icon-credit-card"></i> {l s='Upgrade to new version' mod='ps_hesabfa'} [{$latestVersion}]</h3>
+		<p>
+			{l s='A new version of plugin is available and we highly recommend you to upgrade plugin to new version before continue. to upgrade first download new version and then install it on previous version.' mod='ps_hesabfa'}<br />
+		</p>
+		<p>
+			<a href='https://www.hesabfa.com/file/prestashop/latest/plugin.zip'>
+				[ {l s='download new version of module' mod='ps_hesabfa'} ]
+			</a>
+		</p>
+	</div>
+{/if}
+
 <div class="panel">
 	<h3><i class="icon icon-credit-card"></i> {l s='Hesabfa Online Accounting Software module!' mod='ps_hesabfa'}</h3>
 	<p>
