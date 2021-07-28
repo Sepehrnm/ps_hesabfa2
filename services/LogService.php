@@ -25,4 +25,13 @@ class LogService
         fclose($file);
         return $fileStr;
     }
+
+    public static function clearLog() {
+        if (file_exists(self::$fileName))
+            file_put_contents(self::$fileName, "");
+    }
+
+    public static function getLogFilePath() {
+        return self::$fileName;
+    }
 }

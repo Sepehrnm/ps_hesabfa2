@@ -157,6 +157,7 @@ class Ps_hesabfa extends Module
                 $this->context->smarty->assign('tokenHesabfaSettings', Tools::getAdminTokenLite('HesabfaSettings'));
                 $this->context->smarty->assign('tokenImportExport', Tools::getAdminTokenLite('ImportExport'));
                 $this->context->smarty->assign('tokenSynchronization', Tools::getAdminTokenLite('Synchronization'));
+                $this->context->smarty->assign('tokenLog', Tools::getAdminTokenLite('Log'));
             }
 
             $updateInfo = $apiService->checkForModuleUpdateInfo();
@@ -224,6 +225,14 @@ class Ps_hesabfa extends Module
         $tab3->module = $this->name;
         $tab3->id_parent = (int)Tab::getIdFromClassName('ShopParameters');
         $tab3->add();
+
+        $tab4 = new Tab;
+        foreach (Language::getLanguages() as $lang)
+            $tab4->name[$lang['id_lang']] = $this->l('Hesabfa plugin events log');
+        $tab4->class_name = 'Log';
+        $tab4->module = $this->name;
+        $tab4->id_parent = (int)Tab::getIdFromClassName('ShopParameters');
+        $tab4->add();
 
         return true;
     }

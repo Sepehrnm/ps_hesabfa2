@@ -1,3 +1,8 @@
+<style>
+	.hesabfa-menu {
+		width: 100px;
+	}
+</style>
 {if $needUpdate eq true}
 	<div class="panel">
 		<h3><i class="icon icon-credit-card"></i> {l s='Upgrade to new version' mod='ps_hesabfa'} [{$latestVersion}]</h3>
@@ -20,23 +25,27 @@
 
 	{if $showBusinessInfo eq true}
 
-		<a href="?controller=HesabfaSettings&token={$tokenHesabfaSettings}" class="btn btn-info">
+		<a href="?controller=HesabfaSettings&token={$tokenHesabfaSettings}" class="btn btn-info hesabfa-menu">
 			<i class="icon-gear" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Plugin Settings' mod='ps_hesabfa'}</a>
 
-		<a href="?controller=ImportExport&token={$tokenImportExport}" class="btn btn-info">
+		<a href="?controller=ImportExport&token={$tokenImportExport}" class="btn btn-info hesabfa-menu">
 			<i class="icon-exchange" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Import And Export' mod='ps_hesabfa'}</a>
 
-		<a href="?controller=Synchronization&token={$tokenSynchronization}" class="btn btn-info">
+		<a href="?controller=Synchronization&token={$tokenSynchronization}" class="btn btn-info hesabfa-menu">
 			<i class="icon-refresh" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Synchronization' mod='ps_hesabfa'}</a>
 
-		<a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank" class="btn btn-warning">
+		<a href="?controller=Log&token={$tokenLog}" class="btn btn-info hesabfa-menu">
+			<i class="icon-file" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
+			{l s='Events Log' mod='ps_hesabfa'}</a>
+
+		<a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank" class="btn btn-warning hesabfa-menu">
 			<i class="icon-question" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Plugin Help' mod='ps_hesabfa'}</a>
 
-		<a href="https://app.hesabfa.com/u/login" target="_blank" class="btn btn-success">
+		<a href="https://app.hesabfa.com/u/login" target="_blank" class="btn btn-success hesabfa-menu">
 			<i class="icon-arrow-right" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Login To Hesabfa' mod='ps_hesabfa'}</a>
 	{/if}
