@@ -8,10 +8,12 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
 class ReceiptService
 {
     public $idLang;
+    private $module;
 
-    public function __construct()
+    public function __construct(Module $module)
     {
         $this->idLang = Configuration::get('PS_LANG_DEFAULT');
+        $this->module = $module;
     }
 
     public function saveReceipt($id_order) {
@@ -19,7 +21,7 @@ class ReceiptService
             return false;
 
         $hesabfaApi = new HesabfaApiService(new SettingService());
-        $invoiceService = new InvoiceService();
+        $invoiceService = new InvoiceService($this->module);
         $psFaService = new PsFaService();
         $invoiceNumber = $psFaService->getInvoiceCodeByPrestaId((int)$id_order);
 

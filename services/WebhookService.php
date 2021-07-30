@@ -213,7 +213,8 @@ class WebhookService
         $productService = new ProductService();
 
         //do nothing if product is GiftWrapping item
-        if ($settingService->getGiftWrappingItemId() == $item->Code)
+        $psFa = $psFaService->getPsFa('gift_wrapping', 0);
+        if ($psFa != null && $psFa->idHesabfa == $item->Code)
             return true;
 
         $id_product = 0;

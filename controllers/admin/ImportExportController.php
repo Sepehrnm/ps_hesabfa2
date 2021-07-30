@@ -63,7 +63,7 @@ class ImportExportController extends ModuleAdminController
         $updateCount = Tools::getValue('updateCount');
         $date = Tools::getValue('date');
 
-        $invoiceService = new InvoiceService();
+        $invoiceService = new InvoiceService($this->module);
         $result = $invoiceService->exportOrders($batch, $totalBatch, $total, $updateCount, $date);
 
         die(Tools::jsonEncode($result));

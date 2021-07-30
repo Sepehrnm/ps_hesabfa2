@@ -82,10 +82,6 @@ interface ISettingService
 
     public function getConnectionStatus();
 
-    public function setGiftWrappingItemId($value);
-
-    public function getGiftWrappingItemId();
-
     public function setLastChangesCheckDate($value);
 
     public function getLastChangesCheckDate();
@@ -302,16 +298,6 @@ class SettingService implements ISettingService
     public function getConnectionStatus()
     {
         return $this->getSetting("CONNECTED");
-    }
-
-    public function setGiftWrappingItemId($value)
-    {
-        $this->setSetting("GIFT_WRAPPING_ITEM_ID", $value);
-    }
-
-    public function getGiftWrappingItemId()
-    {
-        return $this->getSetting("GIFT_WRAPPING_ITEM_ID");
     }
 
     public function setLastChangesCheckDate($value) {

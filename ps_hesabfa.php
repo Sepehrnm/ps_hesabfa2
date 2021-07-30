@@ -35,7 +35,9 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/InvoiceService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/SettingService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ReceiptService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/HesabfaApiService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/PsFaService.php');
 include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/WebhookService.php');
+include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/model/PsFa.php');
 
 use Spatie\Async\Pool;
 
@@ -391,7 +393,9 @@ class Ps_hesabfa extends Module
                 }
 
                 //set the Gift wrapping service id
-                if ($settingService->getGiftWrappingItemId() == 0) {
+                $psFaService = new PsFaService();
+                $psFa = $psFaService->getPsFa('gift_wrapping', 0);
+                if (!$psFa) {
                     $gift_wrapping = $hesabfa->itemSave(array(
                         'Name' => 'Gift wrapping service',
                         'ItemType' => 1,
@@ -399,8 +403,12 @@ class Ps_hesabfa extends Module
                     ));
 
                     if ($gift_wrapping->Success) {
-                        $settingService->setGiftWrappingItemId($gift_wrapping->Result->Code);
-
+                        $psFa = new PsFa();
+                        $psFa->idPs = 0;
+                        $psFa->idPsAttribute = 0;
+                        $psFa->idHesabfa = $gift_wrapping->Result->Code;
+                        $psFa->objType = 'gift_wrapping';
+                        $psFaService->save($psFa);
                         $msg = 'Hesabfa Gift wrapping service added successfully. Service Code: ' . $gift_wrapping->Result->Code;
                         LogService::writeLogStr($msg);
                     } else {
@@ -524,7 +532,7 @@ class Ps_hesabfa extends Module
         //LogService::writeLogStr('order status: ' . (string)$params["orderStatus"]);
 
         if ($settingStatus == -1 || $params["orderStatus"] == $settingStatus) {
-            $invoiceService = new InvoiceService();
+            $invoiceService = new InvoiceService($this);
             $invoiceService->saveInvoice((int)$params['order']->id);
         }
     }
@@ -532,14 +540,14 @@ class Ps_hesabfa extends Module
     public function hookActionPaymentConfirmation($params)
     {
         LogService::writeLogStr("====== hookActionPaymentConfirmation ======");
-        $receiptService = new ReceiptService();
+        $receiptService = new ReceiptService($this);
         $receiptService->saveReceipt($params['id_order']);
     }
 
     public function hookActionOrderStatusPostUpdate($params)
     {
         LogService::writeLogStr("====== hookActionOrderStatusPostUpdate ======");
-        $invoiceService = new InvoiceService();
+        $invoiceService = new InvoiceService($this);
         $invoiceService->saveReturnInvoice($params['id_order'], $params['newOrderStatus']->id);
     }
 

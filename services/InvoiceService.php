@@ -11,10 +11,12 @@ include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/services/ReceiptService.php');
 class InvoiceService
 {
     public $idLang;
+    private $module;
 
-    public function __construct()
+    public function __construct(Module $module)
     {
         $this->idLang = Configuration::get('PS_LANG_DEFAULT');
+        $this->module = $module;
     }
 
     public function saveInvoice($orderId, $orderType = 0, $reference = null)
@@ -110,17 +112,20 @@ class InvoiceService
             $i++;
         }
 
-//        if ($order->total_wrapping_tax_excl > 0) {
-//            array_push($items, array (
-//                'RowNumber' => $i+1,
-//                'ItemCode' => Configuration::get('SSBHESABFA_ITEM_GIFT_WRAPPING_ID'),
-//                'Description' => $this->l('Gift wrapping Service'),
-//                'Quantity' => 1,
-//                'UnitPrice' => $this->getOrderPriceInHesabfaDefaultCurrency(($order->total_wrapping), $orderId),
-//                'Discount' => 0,
-//                'Tax' => $this->getOrderPriceInHesabfaDefaultCurrency(($order->total_wrapping_tax_incl - $order->total_wrapping_tax_excl), $orderId),
-//            ));
-//        }
+        if ($order->total_wrapping_tax_excl > 0) {
+            $psFaGift = $psFaService->getPsFa('gift_wrapping', 0);
+            array_push($items, array (
+                'RowNumber' => $i+1,
+                'ItemCode' => $psFaGift->idHesabfa,
+                'Description' => $this->module->l('Gift wrapping Service'),
+                'Quantity' => 1,
+                'UnitPrice' => $this->getOrderPriceInHesabfaDefaultCurrency(($order->total_wrapping), $order),
+                'Discount' => 0,
+                'Tax' => $this->getOrderPriceInHesabfaDefaultCurrency(($order->total_wrapping_tax_incl - $order->total_wrapping_tax_excl), $order),
+            ));
+        }
+
+        LogService::writeLogStr("gift wrapping in invoice : next");
 
         return $items;
     }
@@ -267,7 +272,7 @@ class InvoiceService
         // implement below
         $settingService = new SettingService();
         $psFaService = new PsFaService();
-        $receiptService = new ReceiptService();
+        $receiptService = new ReceiptService($this->module);
 
         $statusToSubmitInvoice = $settingService->getInWhichStatusAddInvoiceToHesabfa();
         $statusToSubmitReturnInvoice = $settingService->getInWhichStatusAddReturnInvoiceToHesabfa();

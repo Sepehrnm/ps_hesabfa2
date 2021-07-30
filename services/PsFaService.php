@@ -161,6 +161,15 @@ class PsFaService
         return true;
     }
 
+    public function save(PsFa $psFa) {
+        Db::getInstance()->insert('ps_hesabfa', array(
+            'id_hesabfa' => $psFa->idHesabfa,
+            'obj_type' => $psFa->objType,
+            'id_ps' => $psFa->idPs,
+            'id_ps_attribute' => $psFa->idPsAttribute,
+        ));
+    }
+
     public function update(PsFa $psFa) {
         Db::getInstance()->update('ps_hesabfa', array(
             'id_hesabfa' => $psFa->idHesabfa,
