@@ -1,6 +1,6 @@
 <style>
 	.hesabfa-menu {
-		width: 100px;
+		width: 120px;
 	}
 </style>
 {if $needUpdate eq true}
