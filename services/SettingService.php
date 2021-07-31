@@ -321,9 +321,9 @@ class SettingService implements ISettingService
         $this->setUpdatePriceFromStoreToHesabfa(1);
         $this->setUpdateQuantityFromHesabfaToStore(1);
         $this->setLastChangesLogId(0);
-        $this->setInWhichStatusAddInvoiceToHesabfa(1);
-        $this->setInWhichStatusAddReturnInvoiceToHesabfa(2);
-        $this->setInWhichStatusAddPaymentReceipt(3);
+        $this->setInWhichStatusAddInvoiceToHesabfa(-1);
+        $this->setInWhichStatusAddReturnInvoiceToHesabfa(7);
+        $this->setInWhichStatusAddPaymentReceipt(2);
         $this->setWhichNumberSetAsInvoiceReference(0);
     }
 

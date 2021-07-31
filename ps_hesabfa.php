@@ -50,7 +50,7 @@ class Ps_hesabfa extends Module
     {
         $this->name = 'ps_hesabfa';
         $this->tab = 'administration';
-        $this->version = '2.0.0';
+        $this->version = '2.0.1';
         $this->author = 'Hesabfa';
         $this->need_instance = 0;
 
@@ -103,20 +103,20 @@ class Ps_hesabfa extends Module
             $this->registerHook('actionOrderStatusPostUpdate') &&
             $this->registerHook('actionOrderEdited') &&
 
-            $this->registerHook('displayAdminOrderTabContent') &&
+            $this->registerHook('displayAdminOrderTabContent');
 
-            $this->createTabLink();
+            //$this->createTabLink();
     }
 
     public function uninstall()
     {
-        $settingService = new SettingService();
-        $settingService->deleteAllSettings();
+        //        $settingService = new SettingService();
+        //        $hesabfaApiService = new HesabfaApiService($settingService);
+//        $hesabfaApiService->fixClearTags();
 
-        $hesabfaApiService = new HesabfaApiService($settingService);
-        $hesabfaApiService->fixClearTags();
-
-        include(dirname(__FILE__) . '/sql/uninstall.php');
+//        $settingService->deleteAllSettings();//
+//
+//        include(dirname(__FILE__) . '/sql/uninstall.php');
 
         return parent::uninstall();
     }
@@ -147,8 +147,11 @@ class Ps_hesabfa extends Module
         $settingService = new SettingService();
         $apiKey = $settingService->getApiKey();
         $apiToken = $settingService->getApiToken();
+        $connected = $settingService->getConnectionStatus();
+
+        $apiService = new HesabfaApiService($settingService);
+
         if ($apiKey && $apiToken) {
-            $apiService = new HesabfaApiService($settingService);
             $result = $apiService->settingGetSubscriptionInfo();
             if ($result->Success) {
                 $this->context->smarty->assign('showBusinessInfo', true);
@@ -161,40 +164,42 @@ class Ps_hesabfa extends Module
                 $this->context->smarty->assign('tokenSynchronization', Tools::getAdminTokenLite('Synchronization'));
                 $this->context->smarty->assign('tokenLog', Tools::getAdminTokenLite('Log'));
             }
+        }
 
-            $updateInfo = $apiService->checkForModuleUpdateInfo();
-            if ($updateInfo) {
-                $latest_version = $updateInfo["latest_version"];
-                $notices = $updateInfo["notice"];
+        $updateInfo = $apiService->checkForModuleUpdateInfo();
+        if ($updateInfo) {
+            $latest_version = $updateInfo["latest_version"];
+            $notices = $updateInfo["notice"];
 
-                if ($latest_version && strpos($latest_version, '.') != false) {
-                    if (Tools::version_compare($this->version, $latest_version)) {
-                        $this->context->smarty->assign('needUpdate', true);
-                        $this->context->smarty->assign('latestVersion', $latest_version);
-                        $updateText = sprintf($this->l('A new version (%s) is available.'), $latest_version);
-                        $output .= $this->displayConfirmation($updateText);
-                    }
+            if ($latest_version && strpos($latest_version, '.') != false) {
+                if (Tools::version_compare($this->version, $latest_version)) {
+                    $needUpdate = true;
+                    $this->context->smarty->assign('latestVersion', $latest_version);
+                    $updateText = sprintf($this->l('A new version (%s) is available.'), $latest_version);
+                    $output .= $this->displayConfirmation($updateText);
                 }
+            }
 
-                if ($notices) {
-                    foreach ($notices as $val) {
-                        if (!isset($val['text']) || !$val['text']) {
-                            continue;
-                        }
-                        if ($val['type'] == 'error') {
-                            $output .= $this->displayError($val['text']);
-                        } elseif ($val['type'] == 'info') {
-                            $output .= $this->displayConfirmation($val['text']);
-                        } else {
-                            $output .= $val['text'];
-                        }
+            if ($notices) {
+                foreach ($notices as $val) {
+                    if (!isset($val['text']) || !$val['text']) {
+                        continue;
+                    }
+                    if ($val['type'] == 'error') {
+                        $output .= $this->displayError($val['text']);
+                    } elseif ($val['type'] == 'info') {
+                        $output .= $this->displayConfirmation($val['text']);
+                    } else {
+                        $output .= $val['text'];
                     }
                 }
             }
         }
 
         $this->context->smarty->assign(array(
-            'need_update' => $needUpdate,
+            'needUpdate' => $needUpdate,
+            'connected' => $connected,
+            'tokenHesabfaWidgets' => Tools::getAdminTokenLite('HesabfaWidgets')
         ));
 
         $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
@@ -272,6 +277,9 @@ class Ps_hesabfa extends Module
      */
     protected function getConfigForm()
     {
+        $settingService = new SettingService();
+        $connected = $settingService->getConnectionStatus();
+
         return array(
             'form' => array(
                 'legend' => array(
@@ -286,6 +294,7 @@ class Ps_hesabfa extends Module
                         'desc' => $this->l('Enter Hesabfa API Key'),
                         'name' => 'PS_HESABFA_API_KEY',
                         'label' => $this->l('API Key'),
+                        'disabled' => $connected
                     ),
                     array(
                         'col' => 3,
@@ -294,6 +303,7 @@ class Ps_hesabfa extends Module
                         'desc' => $this->l('Enter Hesabfa API Token'),
                         'name' => 'PS_HESABFA_API_TOKEN',
                         'label' => $this->l('API Token'),
+                        'disabled' => $connected
                     ),
                 ),
                 'submit' => array(
@@ -381,11 +391,11 @@ class Ps_hesabfa extends Module
 
                 //set the last log ID
                 $lastChange = $settingService->getLastChangesLogId();
-                if($lastChange == 0) {
+                if ($lastChange == 0) {
                     $changes = $hesabfa->settingGetChanges($lastChange);
                     if ($changes->Success) {
-                            $lastChange = end($changes->Result);
-                            $settingService->setLastChangesLogId($lastChange->Id);
+                        $lastChange = end($changes->Result);
+                        $settingService->setLastChangesLogId($lastChange->Id);
                     } else {
                         $msg = 'Cannot check the last change ID. Error Message: ' . $changes->ErrorMessage . ', Error Code: ' . $changes->ErrorCode;
                         LogService::writeLogStr($msg);
@@ -441,7 +451,7 @@ class Ps_hesabfa extends Module
             $this->context->controller->addCSS($this->_path . 'views/css/back.css');
         }
 
-         $this->cronJob();
+        $this->cronJob();
     }
 
     /**
@@ -560,9 +570,11 @@ class Ps_hesabfa extends Module
     public function cronJob()
     {
         $settingService = new SettingService();
+        $connected = $settingService->getConnectionStatus();
+        if(!$connected)
+            return;
         $syncChangesLastDate = $settingService->getLastChangesCheckDate();
-        if(!isset($syncChangesLastDate) || $syncChangesLastDate == false)
-        {
+        if (!isset($syncChangesLastDate) || $syncChangesLastDate == false) {
             $settingService->setLastChangesCheckDate((new DateTime())->format('Y-m-d H:i:s'));
             $syncChangesLastDate = new DateTime();
         } else {
@@ -575,14 +587,15 @@ class Ps_hesabfa extends Module
         $nowDateTime = new DateTime();
         $diff = $nowDateTime->diff($syncChangesLastDate);
 
-        if($diff->i > 5) {
+        if ($diff->i > 3) {
             LogService::writeLogStr('===== Sync Changes Automatically =====');
             $settingService->setLastChangesCheckDate((new DateTime())->format('Y-m-d H:i:s'));
             new WebhookService();
         }
     }
 
-    public function hookDisplayAdminOrderTabContent($params) {
+    public function hookDisplayAdminOrderTabContent($params)
+    {
         $psFaService = new PsFaService();
         $psFa = $psFaService->getPsFa('order', $params["id_order"]);
         $this->context->smarty->assign('invoiceNumber', $psFa ? $psFa->idHesabfa : 0);

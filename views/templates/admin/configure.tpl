@@ -48,6 +48,10 @@
 		<a href="https://app.hesabfa.com/u/login" target="_blank" class="btn btn-success hesabfa-menu">
 			<i class="icon-arrow-right" style="font-size: 28px; height: 30px; width: 30px;margin: 0 auto;display: block;"></i>
 			{l s='Login To Hesabfa' mod='ps_hesabfa'}</a>
+
+		<a href="javascript:void(0)" class="btn btn-danger hesabfa-menu" id="hesabfa-delete-plugin" style="width: 120px">
+			<i class="icon-remove" style="font-size: 28px; height: 30px; width: 30px; margin: 0 auto; display: block;"></i>
+			{l s='Delete Plugin Data' mod='ps_hesabfa'}</a>
 	{/if}
 </div>
 
@@ -68,6 +72,51 @@
 		{l s='Subscription Plan' mod='ps_hesabfa'}: <strong>{$subscription}</strong><br>
 		{l s='Document Credit' mod='ps_hesabfa'}: <strong>{$documentCredit}</strong><br>
 		{l s='Expire Date' mod='ps_hesabfa'}: <strong>{$expireDate}</strong>
+		{if $connected eq true}
+		<hr>
+			<span class="text-danger">
+				{l s='To connect another business to plugin first delete plugin data and uninstall plugin, then reinstall plugin.' mod='ps_hesabfa'}
+			</span>
+		{/if}
 	</div>
 {/if}
 
+<script>
+	jQuery(function ($) {
+		$('#hesabfa-delete-plugin').click(function () {
+
+			const r = confirm("هشدار: آیا از حذف دیتای افزونه مطئن هستید؟");
+			if (r) {
+				const rr = confirm("هشدار: آیا از حذف دیتای افزونه مطئن هستید؟"
+				+ "\n توجه کنید که با این عملیات تمام ارتباطات افزونه با کسب و کار کنونی و تمام تنظیمات از بین می رود" +
+						" و این عملیات غیر قابل برگشت است.");
+				if(rr) {
+					$('#hesabfa-delete-plugin').prop('disabled', true);
+					const data = {
+						'ajax': true,
+						'controller': 'HesabfaWidgets',
+						'action': 'deletePluginData',
+						'token': '{$tokenHesabfaWidgets}'
+					};
+					$.post('index.php', data, function (response) {
+						$('#hesabfa-delete-plugin').prop('disabled', false);
+						if (response !== 'failed') {
+							const res = JSON.parse(response);
+							if(res) {
+								alert('Plugin data and tables deleted successfully. now uninstall plugin from modules management.\n' +
+										'دیتای افزونه و جداول مربوطه حذف شدند، اکنون می توانید از منوی مدیریت ماژول ها افزونه حسابفا را حذف کنید و در صورت نیاز مجدد نصب کنید.');
+								location.reload();
+							} else {
+								alert('Error deleting plugin data. see log for details.');
+							}
+						} else {
+							alert('Error deleting plugin data. see log for details.');
+							return false;
+						}
+					});
+				}
+			}
+			return false;
+		});
+	});
+</script>

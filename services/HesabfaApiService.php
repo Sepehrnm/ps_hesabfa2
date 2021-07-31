@@ -448,12 +448,13 @@ class HesabfaApiService implements IHesabfaApiService
     public function checkForModuleUpdateInfo() {
         try {
             $curl_connection = curl_init('https://hesabfa.com/file/prestashop_module_info.json');
-            curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 60);
+            //curl_setopt($curl_connection, CURLOPT_CONNECTTIMEOUT, 60);
             curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, false);
+            //curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, false);
 
             $data = json_decode(curl_exec($curl_connection), true);
             curl_close($curl_connection);
+
             if ($data) {
                 return Array(
                     "latest_version"=> key_exists("latest_version", $data) ? $data["latest_version"] : null,
