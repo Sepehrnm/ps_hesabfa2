@@ -109,6 +109,10 @@ class SettingService implements ISettingService
         return Configuration::get(self::$pluginPrefix . $key);
     }
 
+    public function deleteSetting($key) {
+        Configuration::deleteByName(self::$pluginPrefix . $key);
+    }
+
     public function setApiKeyAndToken($apiKey, $apiToken)
     {
         $this->setSetting("API_KEY", $apiKey);
@@ -300,11 +304,13 @@ class SettingService implements ISettingService
         return $this->getSetting("CONNECTED");
     }
 
-    public function setLastChangesCheckDate($value) {
+    public function setLastChangesCheckDate($value)
+    {
         $this->setSetting("LAST_CHANGES_CHECK_DATE", $value);
     }
 
-    public function getLastChangesCheckDate() {
+    public function getLastChangesCheckDate()
+    {
         return $this->getSetting("LAST_CHANGES_CHECK_DATE");
     }
 
@@ -336,6 +342,13 @@ class SettingService implements ISettingService
         foreach ($configurations as $configuration) {
             Configuration::deleteByName($configuration['name']);
         }
+    }
+
+    public function deleteSomeSettings()
+    {
+        $this->deleteSetting("CONNECTED");
+        $this->deleteSetting("API_KEY");
+        $this->deleteSetting("API_TOKEN");
     }
 
 }

@@ -20,10 +20,7 @@ class LogService
 
     public static function readLog()
     {
-        $file = fopen(self::$fileName, "r");
-        $fileStr = fread($file, filesize(self::$fileName));
-        fclose($file);
-        return $fileStr;
+        return file_get_contents(self::$fileName);
     }
 
     public static function clearLog() {

@@ -82,7 +82,8 @@ class InvoiceService
 
             //fix remaining discount amount on last item
             $array_key = array_keys($products);
-            $product_price = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'], $order);
+//            $product_price = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'], $order);
+            $product_price = $this->getOrderPriceInHesabfaDefaultCurrency($product['product_price'], $order);
 
             if (end($array_key) == $key) {
                 $discount = $order_total_discount - $total_discounts;
@@ -91,13 +92,17 @@ class InvoiceService
                 $total_discounts += $discount;
             }
 
-            $reduction_amount = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'] - $product['product_price'], $order);
-            $discount += $reduction_amount * $product['product_quantity'];
+            //$reduction_amount = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'] - $product['product_price'], $order);
+            //$discount += $reduction_amount * $product['product_quantity'];
 
             //fix if total discount greater than product price
             if ($discount > $product_price * $product['product_quantity']) {
                 $discount = $product_price * $product['product_quantity'];
             }
+
+            LogService::writeLogStr("=========================");
+            LogService::writeLogStr("item discount: " . $discount);
+            LogService::writeLogStr("=========================");
 
             $item = array (
                 'RowNumber' => $i,
@@ -125,8 +130,6 @@ class InvoiceService
             ));
         }
 
-        LogService::writeLogStr("gift wrapping in invoice : next");
-
         return $items;
     }
 
@@ -148,6 +151,8 @@ class InvoiceService
 
         if ($reference === null)
             $reference = $settingService->getWhichNumberSetAsInvoiceReference() ? $order->reference : $orderId;
+
+        LogService::writeLogStr("customer id: " . $order->id_customer);
 
         return array (
             'Number' => $psFaService->getInvoiceCodeByPrestaId($orderId),
@@ -205,17 +210,19 @@ class InvoiceService
         $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts, $order);
         $shipping = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_shipping_tax_incl, $order);
 
+        LogService::writeLogStr("order->total_shipping_tax_incl:" . $order->total_shipping_tax_incl);
+
         $sql = 'SELECT `free_shipping` 
                     FROM `' . _DB_PREFIX_ . 'order_cart_rule`
                     WHERE `id_order` = '. $orderId;
         $result = Db::getInstance()->executeS($sql);
 
-        foreach ($result as $item) {
-            if ($item['free_shipping']) {
-                $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts - $order->total_shipping_tax_incl, $order);
-                $shipping = 0;
-            }
-        }
+//        foreach ($result as $item) {
+//            if ($item['free_shipping']) {
+//                $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts - $order->total_shipping_tax_incl, $order);
+//                $shipping = 0;
+//            }
+//        }
 
         //calculate discount split
         $order_total_products = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_products, $order);

@@ -1,6 +1,9 @@
 <div class="panel">
     <div class="panel-heading">
         {l s='Export products to Hesabfa' mod='ps_hesabfa'}
+        &nbsp;&nbsp;&nbsp;
+        <a href="?controller=AdminModules&configure=ps_hesabfa&token={$tokenHesabfaModuleConfigure}">
+            [ {l s='Return to main page' mod='ps_hesabfa'} ]</a>
     </div>
     <div class="panel-body">
         <p class="hesabfa-p mt-2">{l s='Export and add all online store products to Hesabfa' mod='ps_hesabfa'}</p>

@@ -28,6 +28,7 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('selectedCustomerAddress', $settingService->getCustomerAddressStatus());
         $this->context->smarty->assign('customerCategoryName', $settingService->getCustomersCategory());
         $this->context->smarty->assign('selectedInvoiceReference', $settingService->getWhichNumberSetAsInvoiceReference());
+        $this->context->smarty->assign('tokenHesabfaModuleConfigure', Tools::getAdminTokenLite('AdminModules'));
 
         LogService::writeLogStr($settingService->getUpdatePriceFromHesabfaToStore());
 

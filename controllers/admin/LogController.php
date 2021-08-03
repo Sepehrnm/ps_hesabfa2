@@ -20,6 +20,7 @@ class LogController  extends ModuleAdminController
         $this->context->smarty->assign(array());
         $this->context->smarty->assign('log', $log);
         $this->context->smarty->assign('logFilePath', LogService::getLogFilePath());
+        $this->context->smarty->assign('tokenHesabfaModuleConfigure', Tools::getAdminTokenLite('AdminModules'));
         $this->setTemplate('log.tpl');
     }
 

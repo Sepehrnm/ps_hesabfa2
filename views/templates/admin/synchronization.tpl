@@ -1,6 +1,9 @@
 <div class="panel">
     <div class="panel-heading">
         {l s='Sync Products Quantity and Price' mod='ps_hesabfa'}
+        &nbsp;&nbsp;&nbsp;
+        <a href="?controller=AdminModules&configure=ps_hesabfa&token={$tokenHesabfaModuleConfigure}">
+            [ {l s='Return to main page' mod='ps_hesabfa'} ]</a>
     </div>
     <div class="panel-body">
         <p class="hesabfa-p mt-2">{l s='Sync Products Quantity and Price with Hesabfa' mod='ps_hesabfa'}</p>

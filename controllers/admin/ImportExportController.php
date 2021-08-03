@@ -18,6 +18,7 @@ class ImportExportController extends ModuleAdminController
     public function initContent() {
         parent::initContent();
         $this->context->smarty->assign(array());
+        $this->context->smarty->assign('tokenHesabfaModuleConfigure', Tools::getAdminTokenLite('AdminModules'));
         $this->setTemplate('import_export.tpl');
     }
 

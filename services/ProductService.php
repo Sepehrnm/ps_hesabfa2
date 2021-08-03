@@ -120,25 +120,25 @@ class ProductService
 
         if ($id_attribute == 0) {
             switch ($codeToUseAsBarcode) {
-                case 1:
+                case 0:
                     return $product->reference;
-                case 2:
+                case 1:
                     return $product->upc;
-                case 3:
+                case 2:
                     return $product->ean13;
-                case 4:
+                case 3:
                     return $product->isbn;
             }
         } else {
             $product_attribute = $product->getAttributeCombinationsById($id_attribute, $this->idLang);
             switch ($codeToUseAsBarcode) {
-                case 1:
+                case 0:
                     return $product_attribute[0]['reference'];
-                case 2:
+                case 1:
                     return $product_attribute[0]['upc'];
-                case 3:
+                case 2:
                     return $product_attribute[0]['ean13'];
-                case 4:
+                case 3:
                     return $product_attribute[0]['isbn'];
             }
         }
@@ -395,8 +395,7 @@ class ProductService
         $result["error"] = false;
 
         $hesabfa = new HesabfaApiService(new SettingService());
-        $filters = array(array("Property" => "Tag", "Operator" => "!=", "Value" => ""),
-            array("Property" => "ItemType", "Operator" => "=", "Value" => 0));
+        $filters = array(array("Property" => "ItemType", "Operator" => "=", "Value" => 0));
         $rpp = 500;
 
         if ($batch == 1) {

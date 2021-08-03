@@ -26,6 +26,9 @@ class ReceiptService
         $invoiceNumber = $psFaService->getInvoiceCodeByPrestaId((int)$id_order);
 
         $payments = OrderPayment::getByOrderId($id_order);
+        $order = new Order($id_order);
+
+        $ok = false;
 
         foreach ($payments as $payment) {
             // Skip free order payment
@@ -44,9 +47,10 @@ class ReceiptService
 
                 $transactionFee = 0;
                 $response = $hesabfaApi->invoiceSavePayment($invoiceNumber, $bank_code, $payment->date_add,
-                    $invoiceService->getOrderPriceInHesabfaDefaultCurrency($payment->amount, $id_order), $payment->transaction_id, $transactionFee);
+                    $invoiceService->getOrderPriceInHesabfaDefaultCurrency($payment->amount, $order), $payment->transaction_id, $transactionFee);
 
                 if ($response->Success) {
+                    $ok = true;
                     LogService::writeLogStr("Hesabfa invoice payment added. order id: $id_order");
                 } else {
                     $msg = 'Cannot add Hesabfa Invoice payment. Error Message: ' . $response->ErrorMessage . ', Error code: ' . $response->ErrorCode . ', order id: ' . $id_order;
@@ -55,9 +59,9 @@ class ReceiptService
             } else {
                 LogService::writeLogStr('Cannot add Hesabfa Invoice payment - Bank Code not defined. order id: ' . $id_order);
             }
-
         }
 
+        return $ok;
     }
 
     public function getBankCodeByPaymentName($paymentName)

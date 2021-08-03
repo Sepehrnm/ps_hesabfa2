@@ -37,8 +37,9 @@ class WebhookService
                         case 'Product':
                             //if Action was deleted
                             if ($item->Action == 53) {
-                                $psFa = $psFaService->getPsFa('product', $item->Extra);
-                                $psFaService->delete($psFa);
+                                $psFa = $psFaService->getPsFaByHesabfaId('product', $item->Extra);
+                                if($psFa)
+                                    $psFaService->delete($psFa);
                                 break;
                             }
 
@@ -47,8 +48,9 @@ class WebhookService
                         case 'Contact':
                             //if Action was deleted
                             if ($item->Action == 33) {
-                                $psFa = $psFaService->getPsFa('customer', $item->Extra);
-                                $psFaService->delete($psFa);
+                                $psFa = $psFaService->getPsFaByHesabfaId('customer', $item->Extra);
+                                if($psFa)
+                                    $psFaService->delete($psFa);
                                 break;
                             }
 
@@ -217,17 +219,12 @@ class WebhookService
         if ($psFa != null && $psFa->idHesabfa == $item->Code)
             return true;
 
-        $id_product = 0;
-        $id_attribute = 0;
+        $psFa = $psFaService->getPsFaByHesabfaId('product', $item->Code);
+        if(!$psFa)
+            return false;
 
-        //set ids if set
-        $json = json_decode($item->Tag);
-        if (is_object($json)) {
-            $id_product = $json->id_product;
-            if (isset($json->id_attribute)) {
-                $id_attribute = $json->id_attribute;
-            }
-        }
+        $id_product = $psFa->idPs;
+        $id_attribute = $psFa->idPsAttribute;
 
         //check if Tag not set in hesabfa
         if ($id_product == 0)
@@ -235,21 +232,13 @@ class WebhookService
 
         $psFa = $psFaService->getPsFa('product', $id_product, $id_attribute);
 
-        if ($psFa->id > 0) {
+        if ($psFa) {
             //ToDo: if product not exists in PS then return
             $product = new Product($id_product);
+            if(!$product)
+                return false;
 
-            //1.set new Hesabfa Item Code if changes
-            if ($psFa->idHesabfa != (int)$item->Code) {
-                $id_hesabfa_old = $psFa->idHesabfa;
-                $psFa->idHesabfa = (int)$item->Code;
-                $psFaService->update($psFa);
-
-                $msg = 'Item Code changed. Old ID: ' . $id_hesabfa_old . '. New ID: ' . (int)$item->Code . ', Product id: ' . $id_product.'-'.$id_attribute;
-                LogService::writeLogStr($msg);
-            }
-
-            //2.set new Price
+            //1.set new Price
             if ($settingService->getUpdatePriceFromHesabfaToStore()) {
                 if ($id_attribute != 0) {
                     $combination = new Combination($id_attribute);
@@ -275,7 +264,7 @@ class WebhookService
                 }
             }
 
-            //3.set new Quantity
+            //2.set new Quantity
             if ($settingService->getUpdateQuantityFromHesabfaToStore()) {
                 if ($id_attribute != 0) {
                     $current_quantity = StockAvailable::getQuantityAvailableByProduct($id_product, $id_attribute);

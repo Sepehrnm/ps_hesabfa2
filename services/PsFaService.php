@@ -31,6 +31,19 @@ class PsFaService
         return (int)Db::getInstance()->getValue($sql);
     }
 
+    public function getPsFaByHesabfaId($objType, $hesabfaId) {
+        $sql = 'SELECT * 
+                    FROM `' . _DB_PREFIX_ . 'ps_hesabfa`
+                    WHERE `id_hesabfa` = '. $hesabfaId .' AND `obj_type` = \''. $objType .'\'
+                    ';
+
+        $result = Db::getInstance()->executeS($sql);
+
+        if(isset($result) && is_array($result) && count($result) > 0)
+            return $this->mapPsFa($result[0]);
+        return null;
+    }
+
     public function getProductCodeByPrestaId($id_product, $id_attribute = 0)
     {
         $obj = $this->getPsFa('product', $id_product, $id_attribute);

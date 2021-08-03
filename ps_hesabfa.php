@@ -50,7 +50,7 @@ class Ps_hesabfa extends Module
     {
         $this->name = 'ps_hesabfa';
         $this->tab = 'administration';
-        $this->version = '2.0.1';
+        $this->version = '2.0.5';
         $this->author = 'Hesabfa';
         $this->need_instance = 0;
 
@@ -103,18 +103,19 @@ class Ps_hesabfa extends Module
             $this->registerHook('actionOrderStatusPostUpdate') &&
             $this->registerHook('actionOrderEdited') &&
 
-            $this->registerHook('displayAdminOrderTabContent');
+            $this->registerHook('displayAdminOrderTabContent') &&
+            $this->registerHook('displayAdminOrderRight');
 
-            //$this->createTabLink();
+        //$this->createTabLink();
     }
 
     public function uninstall()
     {
-        //        $settingService = new SettingService();
+        $settingService = new SettingService();
         //        $hesabfaApiService = new HesabfaApiService($settingService);
 //        $hesabfaApiService->fixClearTags();
 
-//        $settingService->deleteAllSettings();//
+        $settingService->deleteSomeSettings();
 //
 //        include(dirname(__FILE__) . '/sql/uninstall.php');
 
@@ -571,7 +572,7 @@ class Ps_hesabfa extends Module
     {
         $settingService = new SettingService();
         $connected = $settingService->getConnectionStatus();
-        if(!$connected)
+        if (!$connected)
             return;
         $syncChangesLastDate = $settingService->getLastChangesCheckDate();
         if (!isset($syncChangesLastDate) || $syncChangesLastDate == false) {
@@ -595,6 +596,18 @@ class Ps_hesabfa extends Module
     }
 
     public function hookDisplayAdminOrderTabContent($params)
+    {
+        $psFaService = new PsFaService();
+        $psFa = $psFaService->getPsFa('order', $params["id_order"]);
+        $this->context->smarty->assign('invoiceNumber', $psFa ? $psFa->idHesabfa : 0);
+        $this->context->smarty->assign('orderId', $params["id_order"]);
+        $this->context->smarty->assign('tokenHesabfaWidgets', Tools::getAdminTokenLite('HesabfaWidgets'));
+
+        $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/order-widget.tpl');
+        return $output;
+    }
+
+    public function hookDisplayAdminOrderRight($params)
     {
         $psFaService = new PsFaService();
         $psFa = $psFaService->getPsFa('order', $params["id_order"]);
