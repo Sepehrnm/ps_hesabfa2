@@ -45,9 +45,9 @@ class ReceiptService
                 if ($payment->transaction_id == '')
                     $payment->transaction_id = 'None';
 
-                $transactionFee = 0;
+                //$transactionFee = 0;
                 $response = $hesabfaApi->invoiceSavePayment($invoiceNumber, $bank_code, $payment->date_add,
-                    $invoiceService->getOrderPriceInHesabfaDefaultCurrency($payment->amount, $order), $payment->transaction_id, $transactionFee);
+                    $invoiceService->getOrderPriceInHesabfaDefaultCurrency($payment->amount, $order), $payment->transaction_id);
 
                 if ($response->Success) {
                     $ok = true;
