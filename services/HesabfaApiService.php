@@ -67,6 +67,10 @@ class HesabfaApiService implements IHesabfaApiService
 
         $url = 'https://api.hesabfa.com/v1/' . $method;
 
+        $apiAddress = $this->settingService->getApiAddress();
+        if($apiAddress == 2)
+            $url = 'http://api.hesabfa.ir/v1/' . $method;
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");

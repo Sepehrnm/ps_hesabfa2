@@ -50,7 +50,7 @@ class Ps_hesabfa extends Module
     {
         $this->name = 'ps_hesabfa';
         $this->tab = 'administration';
-        $this->version = '2.0.8';
+        $this->version = '2.0.9';
         $this->author = 'Hesabfa';
         $this->need_instance = 0;
 
@@ -281,6 +281,17 @@ class Ps_hesabfa extends Module
         $settingService = new SettingService();
         $connected = $settingService->getConnectionStatus();
 
+        $apiAddressOptions = array(
+            array(
+                'id_option' => 1,
+                'name' => 'Address 1 (Cloudflare)'
+            ),
+            array(
+                'id_option' => 2,
+                'name' => 'Address 2 (Arvancloud)'
+            ),
+        );
+
         return array(
             'form' => array(
                 'legend' => array(
@@ -291,7 +302,7 @@ class Ps_hesabfa extends Module
                     array(
                         'col' => 3,
                         'type' => 'text',
-                        'prefix' => '<i class="icon icon-envelope"></i>',
+                        'prefix' => '<i class="icon icon-key"></i>',
                         'desc' => $this->l('Enter Hesabfa API Key'),
                         'name' => 'PS_HESABFA_API_KEY',
                         'label' => $this->l('API Key'),
@@ -300,11 +311,24 @@ class Ps_hesabfa extends Module
                     array(
                         'col' => 3,
                         'type' => 'text',
-                        'prefix' => '<i class="icon icon-envelope"></i>',
+                        'prefix' => '<i class="icon icon-token"></i>',
                         'desc' => $this->l('Enter Hesabfa API Token'),
                         'name' => 'PS_HESABFA_API_TOKEN',
                         'label' => $this->l('API Token'),
                         'disabled' => $connected
+                    ),
+                    array(
+                        'col' => 3,
+                        'type' => 'select',
+                        'prefix' => '<i class="icon icon-link"></i>',
+                        'desc' => $this->l('Select Hesabfa API address to use'),
+                        'name' => 'PS_HESABFA_API_ADDRESS',
+                        'label' => $this->l('API Address'),
+                        'options' => array(
+                            'query' => $apiAddressOptions,
+                            'id' => 'id_option',
+                            'name' => 'name'
+                        ),
                     ),
                 ),
                 'submit' => array(
@@ -324,6 +348,7 @@ class Ps_hesabfa extends Module
         return array(
             'PS_HESABFA_API_KEY' => $settingService->getApiKey(),
             'PS_HESABFA_API_TOKEN' => $settingService->getApiToken(),
+            'PS_HESABFA_API_ADDRESS' => $settingService->getApiAddress(),
         );
     }
 
@@ -335,9 +360,13 @@ class Ps_hesabfa extends Module
         $form_values = $this->getConfigFormValues();
         $apiKey = Tools::getValue('PS_HESABFA_API_KEY');
         $apiToken = Tools::getValue('PS_HESABFA_API_TOKEN');
+        $apiAddress = Tools::getValue('PS_HESABFA_API_ADDRESS');
 
         $settingService = new SettingService();
-        $settingService->setApiKeyAndToken($apiKey, $apiToken);
+        if($apiKey && $apiToken)
+            $settingService->setApiKeyAndToken($apiKey, $apiToken);
+
+        $settingService->setApiAddress($apiAddress);
 
         // connect to Hesabfa
         $apiService = new HesabfaApiService($settingService);

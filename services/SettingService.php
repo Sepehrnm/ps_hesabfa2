@@ -12,6 +12,10 @@ interface ISettingService
 
     public function getApiToken();
 
+    public function getApiAddress();
+
+    public function setApiAddress($value);
+
     public function testApiConnection($apiKey, $apiToken);
 
     public function setInWhichStatusAddInvoiceToHesabfa($status);
@@ -127,6 +131,14 @@ class SettingService implements ISettingService
     public function getApiToken()
     {
         return $this->getSetting("API_TOKEN");
+    }
+
+    public function getApiAddress() {
+        return $this->getSetting("API_ADDRESS");
+    }
+
+    public function setApiAddress($value) {
+        $this->setSetting("API_ADDRESS", $value);
     }
 
     public function testApiConnection($apiKey, $apiToken)
