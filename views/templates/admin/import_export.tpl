@@ -221,7 +221,7 @@
                         let progress = (res.batch * 100) / res.totalBatch;
                         progress = Math.round(progress);
                         $('#exportCustomersProgressBar').css('width', progress + '%').attr('aria-valuenow', progress);
-                        exportProducts(res.batch + 1, res.totalBatch, res.total, res.updateCount);
+                        exportCustomers(res.batch + 1, res.totalBatch, res.total, res.updateCount);
                         return false;
                     } else {
                         $('#exportCustomersProgressBar').css('width', 100 + '%').attr('aria-valuenow', 100);
