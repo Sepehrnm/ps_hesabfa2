@@ -569,9 +569,11 @@ class Ps_hesabfa extends Module
         LogService::writeLogStr("====== hookActionValidateOrder ======");
         $settingService = new SettingService();
         $settingStatus = $settingService->getInWhichStatusAddInvoiceToHesabfa();
-        //LogService::writeLogStr('order status: ' . (string)$params["orderStatus"]);
 
-        if ($settingStatus == -1 || $params["orderStatus"] == $settingStatus) {
+//        LogService::writeLogStr('order status to set invoice: ' . $settingStatus);
+//        LogService::writeLogObj($params);
+
+        if ($settingStatus == -1 || $params["orderStatus"]->id == $settingStatus) {
             $invoiceService = new InvoiceService($this);
             $invoiceService->saveInvoice((int)$params['order']->id);
         }
@@ -587,7 +589,18 @@ class Ps_hesabfa extends Module
     public function hookActionOrderStatusPostUpdate($params)
     {
         LogService::writeLogStr("====== hookActionOrderStatusPostUpdate ======");
+
         $invoiceService = new InvoiceService($this);
+        $settingService = new SettingService();
+        $settingStatus = $settingService->getInWhichStatusAddInvoiceToHesabfa();
+
+        if ($settingStatus == -1 || $params["newOrderStatus"]->id == $settingStatus) {
+            $psFaService = new PsFaService();
+            $psFa = $psFaService->getPsFa('order', (int)$params['id_order']);
+            if(!$psFa)
+                $invoiceService->saveInvoice((int)$params['id_order']);
+        }
+
         $invoiceService->saveReturnInvoice($params['id_order'], $params['newOrderStatus']->id);
     }
 
