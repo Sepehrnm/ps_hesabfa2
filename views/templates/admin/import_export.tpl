@@ -158,8 +158,8 @@
 
                     if(res.error) {
                         alert(res.errorMessage);
-                        $('#exportCustomersProgress').hide();
-                        $('#hesabfa_export_customers').prop('disabled', false);
+                        $('#exportProductsProgressBar').hide();
+                        $('#hesabfa_export_products').prop('disabled', false);
                         return false;
                     }
 

@@ -24,6 +24,10 @@ class ProductService
         foreach ($productIdArray as $productId) {
             $product = new Product($productId);
 
+            //$packedProducts = GetPackedProducts($productId);
+//            LogService::writeLogStr("Product: ");
+//            LogService::writeLogObj($product);
+
             // set base product
             $items[] = $this->mapProduct($product, $productId, false);
 
@@ -298,9 +302,8 @@ class ProductService
             $hesabfa = new HesabfaApiService(new SettingService());
             $response = $hesabfa->itemBatchSave($items);
             if ($response->Success) {
-                foreach ($response->Result as $item) {
-                    $psFaService->saveProduct($item);
-                }
+                LogService::writeLogStr("*** bulk insert ***");
+                $psFaService->saveProductBatch($response->Result);
             } else {
                 $result["error"] = true;
                 $result["errorMessage"] = "Cannot add bulk item. Error Message: " . (string)$response->ErrorMessage . ". Error Code: " . (string)$response->ErrorCode . ".";
