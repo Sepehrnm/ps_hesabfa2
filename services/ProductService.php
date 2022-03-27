@@ -24,10 +24,6 @@ class ProductService
         foreach ($productIdArray as $productId) {
             $product = new Product($productId);
 
-            //$packedProducts = GetPackedProducts($productId);
-//            LogService::writeLogStr("Product: ");
-//            LogService::writeLogObj($product);
-
             // set base product
             $items[] = $this->mapProduct($product, $productId, false);
 
