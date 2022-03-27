@@ -49,18 +49,11 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('selectedReturnInvoiceStatus', $settingService->getInWhichStatusAddReturnInvoiceToHesabfa());
         $this->context->smarty->assign('selectedInvoiceReceiptStatus', $settingService->getInWhichStatusAddPaymentReceipt());
 
-        $paymentMethods = $this->getPaymentMethodsName();
         $banks = $this->getBanksInHesabfa();
 
-        $this->context->smarty->assign('paymentMethods', $paymentMethods);
         $this->context->smarty->assign('banks', $banks);
-
-        $selectedBanks = [];
-        foreach ($paymentMethods as $p) {
-            $bankId = $settingService->getPaymentReceiptDestination($p["id"]);
-            $selectedBanks[$p["id"]] = $bankId;
-        }
-        $this->context->smarty->assign('selectedBanks', $selectedBanks);
+        $selectedBankId = $settingService->getPaymentReceiptDestination();
+        $this->context->smarty->assign('selectedBankId', $selectedBankId);
 
         $this->setTemplate('hesabfaSettings.tpl');
     }
@@ -127,9 +120,7 @@ class HesabfaSettingsController extends ModuleAdminController
 
         $settingService->setInWhichStatusAddPaymentReceipt($formData["invoiceReceiptStatus"]);
 
-        foreach ($formData["paymentMethods"] as $paymentMethod) {
-            $settingService->setPaymentReceiptDestination($paymentMethod["paymentMethodId"], $paymentMethod["bankId"]);
-        }
+        $settingService->setPaymentReceiptDestination($formData["paymentReceiptBankCode"]);
 
         echo true;
         die;

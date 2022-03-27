@@ -367,6 +367,26 @@ class HesabfaApiService implements IHesabfaApiService
         return $this->apiRequest($method, $data);
     }
 
+    public function invoiceGetReceipts($number) {
+        $method = 'receipt/getReceipts';
+        $data = array(
+            'type' => 1,
+            'queryInfo' => array(array('Property' => 'Invoice.Number', 'Operator' => '=', 'Value' => (int)$number)),
+        );
+
+        return $this->apiRequest($method, $data);
+    }
+
+    public function invoiceDeleteReceipt($number) {
+        $method = 'receipt/delete';
+        $data = array(
+            'type' => 1,
+            'number' => $number,
+        );
+
+        return $this->apiRequest($method, $data);
+    }
+
     public function invoiceGetOnlineInvoiceURL($number, $type = 0)
     {
         $method = 'invoice/getonlineinvoiceurl';

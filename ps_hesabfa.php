@@ -593,6 +593,7 @@ class Ps_hesabfa extends Module
         $invoiceService = new InvoiceService($this);
         $settingService = new SettingService();
         $settingStatus = $settingService->getInWhichStatusAddInvoiceToHesabfa();
+        $settingStatusReceipt = $settingService->getInWhichStatusAddPaymentReceipt();
 
         if ($settingStatus == -1 || $params["newOrderStatus"]->id == $settingStatus) {
             $psFaService = new PsFaService();
@@ -600,6 +601,11 @@ class Ps_hesabfa extends Module
             if(!$psFa)
                 $invoiceService->saveInvoice((int)$params['id_order']);
         }
+
+//        if($params["newOrderStatus"]->id == $settingStatusReceipt) {
+//            $receiptService = new ReceiptService($this);
+//            $receiptService->saveReceipt($params['id_order']);
+//        }
 
         $invoiceService->saveReturnInvoice($params['id_order'], $params['newOrderStatus']->id);
     }

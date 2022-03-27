@@ -100,19 +100,14 @@
         </select>
 
         <p style="margin-top: 15px;">
-            {l s='Select in every Payment Method which bank should be affected.' mod='ps_hesabfa'}
+            {l s='In which bank register payment receipt' mod='ps_hesabfa'}
         </p>
-
-        {* loop for payment methods *}
-        {foreach from=$paymentMethods item=p}
-            <label style="margin-top: 10px">{l s=$p.name mod='ps_hesabfa'}</label>&nbsp;
-            <select class="form-control payment-method" data-id="{$p.id}" style="max-width: 250px">
-                {foreach from=$banks item=b}
-                    <option {if $selectedBanks[$p.id] eq $b.id} selected {/if}
-                            value="{$b.id}">{$b.name}</option>
-                {/foreach}
-            </select>
-        {/foreach}
+        <select class="form-control payment-method" id="receipt-bank" style="max-width: 250px">
+            {foreach from=$banks item=b}
+                <option {if $selectedBankId eq $b.id} selected {/if}
+                        value="{$b.id}">{$b.name}</option>
+            {/foreach}
+        </select>
 
     </div>
 
@@ -140,15 +135,9 @@
                 invoiceStatus: $('#hesabfa-setting-invoice-status').val(),
                 returnInvoiceStatus: $('#hesabfa-setting-return-invoice-status').val(),
 
-                invoiceReceiptStatus: $('#hesabfa-setting-invoice-receipt-status').val()
-            }
+                invoiceReceiptStatus: $('#hesabfa-setting-invoice-receipt-status').val(),
 
-            formData["paymentMethods"] = [];
-            const paymentMethodEls = $('.payment-method');
-
-            for (let i = 0; i < paymentMethodEls.length; i++) {
-                const p = paymentMethodEls[i];
-                formData["paymentMethods"].push({ paymentMethodId: $(p).attr("data-id"), bankId: $(p).val() });
+                paymentReceiptBankCode: $('#receipt-bank').val()
             }
 
             const data = {

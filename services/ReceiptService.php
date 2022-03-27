@@ -25,27 +25,23 @@ class ReceiptService
         $psFaService = new PsFaService();
         $invoiceNumber = $psFaService->getInvoiceCodeByPrestaId((int)$id_order);
 
+        if($invoiceNumber && !$this->checkOldReceipts($invoiceNumber)) return false;
+
         $payments = OrderPayment::getByOrderId($id_order);
         $order = new Order($id_order);
 
         $ok = false;
 
         foreach ($payments as $payment) {
-            // Skip free order payment
-            if ($payment->amount <= 0) {
+            if ($payment->amount <= 0) return true;
+
+            $bank_code = $this->getBankCode();
+
+            if ($bank_code == -1)
                 return true;
-            }
+            elseif ($bank_code != false) {
+                if ($payment->transaction_id == '') $payment->transaction_id = 'None';
 
-            $bank_code = $this->getBankCodeByPaymentName($payment->payment_method);
-
-            if ($bank_code == -1) {
-                return true;
-            } elseif ($bank_code != false) {
-                // fix Hesabfa API error
-                if ($payment->transaction_id == '')
-                    $payment->transaction_id = 'None';
-
-                //$transactionFee = 0;
                 $response = $hesabfaApi->invoiceSavePayment($invoiceNumber, $bank_code, $payment->date_add,
                     $invoiceService->getOrderPriceInHesabfaDefaultCurrency($payment->amount, $order), $payment->transaction_id);
 
@@ -64,27 +60,42 @@ class ReceiptService
         return $ok;
     }
 
-    public function getBankCodeByPaymentName($paymentName)
-    {
-        $settingService = new SettingService();
+    public function checkOldReceipts($invoiceNumber) {
+        $hesabfaApi = new HesabfaApiService(new SettingService());
+        $response = $hesabfaApi->invoiceGetReceipts($invoiceNumber);
 
-        $sql = 'SELECT `module` FROM `' . _DB_PREFIX_ . 'orders` 
-                WHERE `payment` = \''. $paymentName .'\'
-        ';
-        $result = Db::getInstance()->ExecuteS($sql);
-
-        $modules_list = Module::getPaymentModules();
-        if (isset($result[0])) {
-            $paymentMethodId = 0;
-            foreach ($modules_list as $module) {
-                $module_obj = Module::getInstanceById($module['id_module']);
-                if ($module_obj->name == $result[0]['module']) {
-                    $paymentMethodId = $module['id_module'];
-                }
-            }
-            return $settingService->getPaymentReceiptDestination($paymentMethodId);
+        if ($response->Success) {
+            if($response->Result->FilteredCount > 0)
+                return $this->deleteOldReceipts($response->Result->List);
+            return true;
         } else {
+            $msg = 'Error getting invoice receipts. Error Message: ' . $response->ErrorMessage . ', Error code: ' . $response->ErrorCode . ', invoice number: ' . $invoiceNumber;
+            LogService::writeLogStr($msg);
             return false;
         }
+    }
+
+    public function deleteOldReceipts($receipts) {
+        $hesabfaApi = new HesabfaApiService(new SettingService());
+        $allDeleted = true;
+
+        foreach ($receipts as $receipt) {
+            $response = $hesabfaApi->invoiceDeleteReceipt($receipt->Number);
+            if ($response->Success) {
+                $msg = 'Invoice receipt deleted. receipt number: ' . $receipt->Number;
+                LogService::writeLogStr($msg);
+            } else {
+                $msg = 'Error deleting invoice receipt. Error Message: ' . $response->ErrorMessage . ', Error code: ' . $response->ErrorCode . ', receipt number: ' . $receipt->Number;
+                LogService::writeLogStr($msg);
+                $allDeleted = false;
+            }
+        }
+        return $allDeleted;
+    }
+
+    public function getBankCode()
+    {
+        $settingService = new SettingService();
+        return $settingService->getPaymentReceiptDestination();
     }
 }

@@ -42,9 +42,9 @@ interface ISettingService
 
     public function getWhichNumberSetAsInvoiceReference();
 
-    public function setPaymentReceiptDestination($paymentMethod, $bankId);
+    public function setPaymentReceiptDestination($bankCode);
 
-    public function getPaymentReceiptDestination($paymentMethod);
+    public function getPaymentReceiptDestination();
 
     public function setLastChangesLogId($value);
 
@@ -206,14 +206,14 @@ class SettingService implements ISettingService
         return $this->getSetting("NUMBER_TO_SET_AS_INVOICE_REFERENCE");
     }
 
-    public function setPaymentReceiptDestination($paymentMethod, $bankId)
+    public function setPaymentReceiptDestination($bankCode)
     {
-        $this->setSetting("PAYMENT_RECEIPT_DESTINATION_" . $paymentMethod, $bankId);
+        $this->setSetting("PAYMENT_RECEIPT_DESTINATION", $bankCode);
     }
 
-    public function getPaymentReceiptDestination($paymentMethod)
+    public function getPaymentReceiptDestination()
     {
-        return $this->getSetting("PAYMENT_RECEIPT_DESTINATION_" . $paymentMethod);
+        return $this->getSetting("PAYMENT_RECEIPT_DESTINATION");
     }
 
     public function setLastChangesLogId($value)
