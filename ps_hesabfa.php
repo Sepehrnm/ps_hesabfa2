@@ -363,7 +363,7 @@ class Ps_hesabfa extends Module
         $apiAddress = Tools::getValue('PS_HESABFA_API_ADDRESS');
 
         $settingService = new SettingService();
-        if($apiKey && $apiToken)
+        if ($apiKey && $apiToken)
             $settingService->setApiKeyAndToken($apiKey, $apiToken);
 
         $settingService->setApiAddress($apiAddress);
@@ -598,14 +598,16 @@ class Ps_hesabfa extends Module
         if ($settingStatus == -1 || $params["newOrderStatus"]->id == $settingStatus) {
             $psFaService = new PsFaService();
             $psFa = $psFaService->getPsFa('order', (int)$params['id_order']);
-            if(!$psFa)
-                $invoiceService->saveInvoice((int)$params['id_order']);
+            if (!$psFa) {
+                $success = $invoiceService->saveInvoice((int)$params['id_order']);
+                if ($success) {
+                    if ($settingStatusReceipt == -1 || $params["newOrderStatus"]->id == $settingStatusReceipt) {
+                        $receiptService = new ReceiptService($this);
+                        $receiptService->saveReceipt($params['id_order']);
+                    }
+                }
+            }
         }
-
-//        if($params["newOrderStatus"]->id == $settingStatusReceipt) {
-//            $receiptService = new ReceiptService($this);
-//            $receiptService->saveReceipt($params['id_order']);
-//        }
 
         $invoiceService->saveReturnInvoice($params['id_order'], $params['newOrderStatus']->id);
     }

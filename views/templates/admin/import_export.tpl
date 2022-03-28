@@ -105,6 +105,9 @@
                     این همسان سازی بصورت خودکار انجام می شود و این گزینه صرفاْ برای مواقعی است که به دلایل فنی
                     مثل قطع اتصال فروشگاه با حسابفا و یا خطا و باگ این همسان سازی صورت نگرفته است.
                 </li>
+                <li>
+                    تاریخ انتخاب شده باید در بازه آخرین سال مالی در حسابفا باشد.
+                </li>
             </ul>
 
         </div>
@@ -127,12 +130,52 @@
     <button class="btn btn-primary" id="hesabfa_export_orders" style="margin-top: 5px;">{l s='Export orders' mod='ps_hesabfa'}</button>
 </div>
 
+<div class="panel">
+    <div class="panel-heading">
+        {l s='Export invoice receipts to Hesabfa' mod='ps_hesabfa'}
+    </div>
+    <div class="panel-body">
+        <div class="progress mt-1 mb-2" style="height: 5px; max-width: 400px; border: 1px solid silver"
+             id="exportReceiptsProgress">
+            <div class="progress-bar progress-bar-striped bg-success" id="exportReceiptsProgressBar"
+                 role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0"
+                 aria-valuemax="100"></div>
+        </div>
+        <div class="p-2 hesabfa-f">
+            <label class="fw-bold mb-2">نکات مهم:</label>
+            <ul>
+                <li>با انجام این عملیات رسید دریافت فاکتورهایی که در حسابفا ثبت شده اند از تاریخ انتخاب شده بررسی و در
+                    حسابفا ثبت می شوند.
+                </li>
+                <li>
+                    با انجام این عملیات رسید یا رسیدهای قبلی فاکتور حذف و رسید یا رسیدهای جدید برای فاکتور ثبت می شود.
+                </li>
+                <li>
+                    تاریخ انتخاب شده باید در بازه آخرین سال مالی در حسابفا باشد.
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <div class="input-group" style="max-width: 150px;">
+        <input class="datetimepicker" type="text" id="hesabfa_sync_receipts_date" name="hesabfa_sync_receipts_date">
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $(".datetimepicker").datepicker({
+                    prevText: '',
+                    nextText: '',
+                    dateFormat: 'yy-mm-dd'
+                });
+            });
+        </script>
+        <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
+    </div>
+    <button class="btn btn-primary" id="hesabfa_export_receipts" style="margin-top: 5px;">{l s='Export invoice receipts' mod='ps_hesabfa'}</button>
+</div>
+
 <script>
     jQuery(function ($) {
-        $('#exportProductsProgress').hide();
-        $('#exportCustomersProgress').hide();
-        $('#exportProductsOpeningQuantityProgress').hide();
-        $('#exportOrdersProgress').hide();
+        $('.progress').hide();
 
         $('#hesabfa_export_products').click(function () {
             $('#hesabfa_export_products').prop('disabled', true);
@@ -343,5 +386,59 @@
             });
         }
 
+        $('#hesabfa_export_receipts').click(function () {
+            $('#hesabfa_export_receipts').prop('disabled', true);
+            $('#exportReceiptsProgress').show();
+            $('#exportReceiptsProgressBar').css('width', 0 + '%').attr('aria-valuenow', 0);
+            exportReceipts(1, 1, 1, 0);
+            return false;
+        });
+        function exportReceipts(batch, totalBatch, total, updateCount) {
+            const data = {
+                'ajax': true,
+                'controller': 'ImportExport',
+                'action': 'exportReceipts',
+                'batch': batch,
+                'totalBatch': totalBatch,
+                'total': total,
+                'updateCount': updateCount,
+                'token': token,
+                'date': $('#hesabfa_sync_receipts_date').val()
+            };
+            $.post('index.php', data, function (response) {
+                if (response !== 'failed') {
+                    const res = JSON.parse(response);
+
+                    if(res.error) {
+                        alert(res.errorMessage);
+                        $('#exportReceiptsProgress').hide();
+                        $('#hesabfa_export_receipts').prop('disabled', false);
+                        return false;
+                    }
+
+                    res.batch = parseInt(res.batch);
+                    if (res.batch < res.totalBatch) {
+                        let progress = (res.batch * 100) / res.totalBatch;
+                        progress = Math.round(progress);
+                        $('#exportReceiptsProgressBar').css('width', progress + '%').attr('aria-valuenow', progress);
+                        setTimeout(()=> {
+                            exportReceipts(res.batch + 1, res.totalBatch, res.total, res.updateCount);
+                        }, 3000);
+                        return false;
+                    } else {
+                        $('#exportReceiptsProgressBar').css('width', 100 + '%').attr('aria-valuenow', 100);
+                        setTimeout(() => {
+                            $('#exportReceiptsProgress').hide();
+                            $('#hesabfa_export_receipts').prop('disabled', false);
+                            alert('Export invoice receipts finished successfully. total receipts exported: ' + res.updateCount);
+                        }, 1000);
+                        return false;
+                    }
+                } else {
+                    alert('Error exporting receipts.');
+                    return false;
+                }
+            });
+        }
     });
 </script>

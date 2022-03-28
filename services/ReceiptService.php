@@ -16,7 +16,8 @@ class ReceiptService
         $this->module = $module;
     }
 
-    public function saveReceipt($id_order) {
+    public function saveReceipt($id_order)
+    {
         if (!isset($id_order))
             return false;
 
@@ -25,7 +26,7 @@ class ReceiptService
         $psFaService = new PsFaService();
         $invoiceNumber = $psFaService->getInvoiceCodeByPrestaId((int)$id_order);
 
-        if($invoiceNumber && !$this->checkOldReceipts($invoiceNumber)) return false;
+        if ($invoiceNumber && !$this->checkOldReceipts($invoiceNumber)) return false;
 
         $payments = OrderPayment::getByOrderId($id_order);
         $order = new Order($id_order);
@@ -60,12 +61,13 @@ class ReceiptService
         return $ok;
     }
 
-    public function checkOldReceipts($invoiceNumber) {
+    public function checkOldReceipts($invoiceNumber)
+    {
         $hesabfaApi = new HesabfaApiService(new SettingService());
         $response = $hesabfaApi->invoiceGetReceipts($invoiceNumber);
 
         if ($response->Success) {
-            if($response->Result->FilteredCount > 0)
+            if ($response->Result->FilteredCount > 0)
                 return $this->deleteOldReceipts($response->Result->List);
             return true;
         } else {
@@ -75,7 +77,8 @@ class ReceiptService
         }
     }
 
-    public function deleteOldReceipts($receipts) {
+    public function deleteOldReceipts($receipts)
+    {
         $hesabfaApi = new HesabfaApiService(new SettingService());
         $allDeleted = true;
 
@@ -97,5 +100,81 @@ class ReceiptService
     {
         $settingService = new SettingService();
         return $settingService->getPaymentReceiptDestination();
+    }
+
+    public function exportReceipts($batch, $totalBatch, $total, $updateCount, $from_date)
+    {
+        LogService::writeLogStr("===== Export Invoice Receipts =====");
+        $settingService = new SettingService();
+        $statusToSubmitPayment = $settingService->getInWhichStatusAddPaymentReceipt();
+
+        $result = array();
+        $result["error"] = false;
+        $rpp = 10;
+
+        if (!isset($from_date) || empty($from_date)) {
+            $result['error'] = true;
+            $result['errorMessage'] = 'Error: Enter correct date.';
+            return $result;
+        }
+
+        if ($batch == 1) {
+            if (!$this->isDateInFiscalYear($from_date)) {
+                $result['error'] = true;
+                $result['errorMessage'] = 'Error: Selected date is not in Hesabfa financial year.';
+                return $result;
+            }
+
+            $sql = "SELECT COUNT(*) FROM `" . _DB_PREFIX_ . "orders` WHERE date_add >= '" . $from_date . "'";
+            $total = (int)Db::getInstance()->getValue($sql);
+            $totalBatch = ceil($total / $rpp);
+        }
+
+        $offset = ($batch - 1) * $rpp;
+        $sql = "SELECT id_order FROM `" . _DB_PREFIX_ . "orders`
+                                WHERE date_add >= '" . $from_date . "'
+                                ORDER BY id_order ASC LIMIT $offset,$rpp";
+        $orders = Db::getInstance()->executeS($sql);
+
+        $psFaService = new PsFaService();
+
+        foreach ($orders as $orderDbRow) {
+            $id_order = $orderDbRow["id_order"];
+
+            $psFa = $psFaService->getPsFa('order', $id_order);
+            if ($psFa) {
+                $order = new Order($id_order);
+                $current_status = $order->current_state;
+
+                if ($statusToSubmitPayment == -1 || $statusToSubmitPayment == $current_status) {
+                    $this->saveReceipt($id_order);
+                    $updateCount++;
+                }
+            }
+        }
+
+        $result["batch"] = $batch;
+        $result["totalBatch"] = $totalBatch;
+        $result["total"] = $total;
+        $result["updateCount"] = $updateCount;
+        return $result;
+    }
+
+    public function isDateInFiscalYear($date)
+    {
+        $hesabfaApi = new HesabfaApiService(new SettingService());
+        $fiscalYear = $hesabfaApi->settingGetFiscalYear();
+
+        if ($fiscalYear->Success) {
+            $fiscalYearStartTimeStamp = strtotime($fiscalYear->Result->StartDate);
+            $fiscalYearEndTimeStamp = strtotime($fiscalYear->Result->EndDate);
+            $dateTimeStamp = strtotime($date);
+
+            if ($dateTimeStamp >= $fiscalYearStartTimeStamp && $dateTimeStamp <= $fiscalYearEndTimeStamp) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }

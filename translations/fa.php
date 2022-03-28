@@ -15,6 +15,8 @@ $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_52eb29f924066488e71300395b784ad5'] 
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_d876ff8da67c3731ae25d8335a4168b4'] = 'کلید API';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_fb38433bd05a0e34a305e27d2f1706f8'] = 'توکن API حسابفا را وارد کنید';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_5161b4f9ce9a8b7d966e8bf3c049f6f3'] = 'توکن API';
+$_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_43c22a7cd7ec7d02ce50d019f7c531fc'] = 'یکی از آدرس های رابط برنامه نویسی حسابفا را انتخاب کنید';
+$_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_4f04a421d2249c484621e94ec867ea7e'] = 'آدرس رابط برنامه نویسی';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_c9cc8cce247e49bae79f15173ce97354'] = 'ذخیره';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettingscontroller_cb7d4cc6fcbd6660886ad65206b59215'] = 'ذخیره در تمام وضعیت ها';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettingscontroller_225dcbfbd01e60b2dd39ba1a7044ee9b'] = 'انتخاب نشده';
@@ -64,7 +66,7 @@ $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ec49d6b8df16d63d7cd1dd1bdc0dff
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_a7edb345c0f3e4ff08f197e2fe040bb2'] = 'در کدام وضعیت فاکتور برگشت از فروش در حسابفا ثبت شود';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_78d88c630d63055c91335d256fabba50'] = 'تنظیمات رسید';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_5b4f1b32173234d86977703239e2c2ec'] = 'در کدام وضعیت رسید فاکتور در حسابفا ثبت شود';
-$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_c8bc3345ddf9cf0da1ccebc0adedfe3f'] = 'انتخاب کنید که در هر روش پرداخت، رسید در کدام بانک در حسابفا ثبت شود.';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_f244b59e50a914ece511772186ed6f92'] = 'در کدام بانک رسید فاکتور در حسابفا ثبت شود';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_c9cc8cce247e49bae79f15173ce97354'] = 'ذخیره';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_e9ca51f247c9224b0a4846ac2f90765f'] = 'صدور محصولات به حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_b0fd66dfa6ee182b00bfeb43728ed460'] = 'بازگشت به صفحه اصلی';
@@ -78,6 +80,8 @@ $_MODULE['<{ps_hesabfa}prestashop>import_export_4713ef5f2d6fc1e8f088c850e696a04b
 $_MODULE['<{ps_hesabfa}prestashop>import_export_672f1a2fc5cfc7327a67a91c43f8d4e3'] = 'صدور سفارش ها به حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_70c2a18e121eceddde27741964531c06'] = 'صدور سفارش های فروشگاه آنلاین به حسابفا بعنوان فاکتور فروش';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_da8cbc8f80b433d3d2b6d13eea457873'] = 'صدور سفارش ها';
+$_MODULE['<{ps_hesabfa}prestashop>import_export_d0486541effc7eddbc09e09797c62182'] = 'صدور رسید دریافت فاکتورها به حسابفا';
+$_MODULE['<{ps_hesabfa}prestashop>import_export_bff5f6c2ab4ac67a47870c79538c3ff3'] = 'صدور رسید فاکتورها';
 $_MODULE['<{ps_hesabfa}prestashop>log_ec7843d0b1895fcfd7f6580ece40d750'] = 'لاگ رویدادها و خطاهای افزونه حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>log_b0fd66dfa6ee182b00bfeb43728ed460'] = 'بازگشت به صفحه اصلی';
 $_MODULE['<{ps_hesabfa}prestashop>log_6bee5661e926f636f142c7f60a227116'] = 'پاک کردن لاگ';

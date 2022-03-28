@@ -69,4 +69,17 @@ class ImportExportController extends ModuleAdminController
 
         die(Tools::jsonEncode($result));
     }
+
+    public function ajaxProcessExportReceipts() {
+        $batch = Tools::getValue('batch');
+        $totalBatch = Tools::getValue('totalBatch');
+        $total = Tools::getValue('total');
+        $updateCount = Tools::getValue('updateCount');
+        $date = Tools::getValue('date');
+
+        $receiptService = new ReceiptService($this->module);
+        $result = $receiptService->exportReceipts($batch, $totalBatch, $total, $updateCount, $date);
+
+        die(Tools::jsonEncode($result));
+    }
 }

@@ -26,11 +26,11 @@ class InvoiceService
         $order = new Order($orderId);
 
         // set invoice customer
-        if(!$this->saveInvoiceCustomer($order))
+        if (!$this->saveInvoiceCustomer($order))
             return false;
 
         // set invoice products
-        if(!$this->saveInvoiceProducts($order))
+        if (!$this->saveInvoiceProducts($order))
             return false;
 
         // get discount and shipping
@@ -46,18 +46,20 @@ class InvoiceService
         return $this->saveInvoiceToHesabfa($hesabfaInvoice, $orderType);
     }
 
-    public function saveReturnInvoice($orderId, $orderStatus) {
+    public function saveReturnInvoice($orderId, $orderStatus)
+    {
         $settingService = new SettingService();
         if ($orderStatus == $settingService->getInWhichStatusAddReturnInvoiceToHesabfa()) {
             $psFaService = new PsFaService();
             $psFa = $psFaService->getPsFa('order', $orderId);
-            if($psFa->id > 0) {
+            if ($psFa->id > 0) {
                 $this->saveInvoice($orderId, 2, $psFa->idHesabfa);
             }
         }
     }
 
-    private function saveInvoiceToHesabfa($hesabfaInvoice, $orderType) {
+    private function saveInvoiceToHesabfa($hesabfaInvoice, $orderType)
+    {
         $hesabfa = new HesabfaApiService(new SettingService());
         $psFaService = new PsFaService();
         $response = $hesabfa->invoiceSave($hesabfaInvoice);
@@ -70,7 +72,8 @@ class InvoiceService
         }
     }
 
-    private function mapInvoiceItems(Order $order, $orderId, $order_total_discount, $split) {
+    private function mapInvoiceItems(Order $order, $orderId, $order_total_discount, $split)
+    {
         $products = $order->getProducts();
         $items = array();
         $psFaService = new PsFaService();
@@ -104,7 +107,7 @@ class InvoiceService
             LogService::writeLogStr("item discount: " . $discount);
             LogService::writeLogStr("=========================");
 
-            $item = array (
+            $item = array(
                 'RowNumber' => $i,
                 'ItemCode' => (int)$code,
                 'Description' => $product['product_name'],
@@ -119,8 +122,8 @@ class InvoiceService
 
         if ($order->total_wrapping_tax_excl > 0) {
             $psFaGift = $psFaService->getPsFa('gift_wrapping', 0);
-            array_push($items, array (
-                'RowNumber' => $i+1,
+            array_push($items, array(
+                'RowNumber' => $i + 1,
                 'ItemCode' => $psFaGift->idHesabfa,
                 'Description' => $this->module->l('Gift wrapping Service'),
                 'Quantity' => 1,
@@ -154,7 +157,7 @@ class InvoiceService
 
         LogService::writeLogStr("customer id: " . $order->id_customer);
 
-        return array (
+        return array(
             'Number' => $psFaService->getInvoiceCodeByPrestaId($orderId),
             'InvoiceType' => $orderType,
             'ContactCode' => $psFaService->getCustomerCodeByPrestaId($order->id_customer),
@@ -176,10 +179,10 @@ class InvoiceService
 
         $contactCode = $psFaService->getPsFaId('customer', $order->id_customer);
         if ($contactCode == 0 || $settingService->getCustomerAddressStatus() == 2) {
-            if(!$customerService->saveCustomer($order->id_customer, $order->id_address_invoice))
+            if (!$customerService->saveCustomer($order->id_customer, $order->id_address_invoice))
                 return false;
         } elseif ($settingService->getCustomerAddressStatus() == 3) {
-            if(!$customerService->saveCustomer($order->id_customer, $order->id_address_delivery))
+            if (!$customerService->saveCustomer($order->id_customer, $order->id_address_delivery))
                 return false;
         }
 
@@ -198,7 +201,7 @@ class InvoiceService
                 $items[] = $product['product_id'];
         }
         if (!empty($items)) {
-            if($productService->saveProducts($items))
+            if ($productService->saveProducts($items))
                 return true;
             else
                 return false;
@@ -206,7 +209,8 @@ class InvoiceService
             return true;
     }
 
-    private function getDiscount(Order $order, $orderId) {
+    private function getDiscount(Order $order, $orderId)
+    {
         $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts, $order);
         $shipping = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_shipping_tax_incl, $order);
 
@@ -214,7 +218,7 @@ class InvoiceService
 
         $sql = 'SELECT `free_shipping` 
                     FROM `' . _DB_PREFIX_ . 'order_cart_rule`
-                    WHERE `id_order` = '. $orderId;
+                    WHERE `id_order` = ' . $orderId;
         $result = Db::getInstance()->executeS($sql);
 
 //        foreach ($result as $item) {
@@ -230,7 +234,7 @@ class InvoiceService
         if ($order_total_discount > 0)
             $split = $order_total_discount / $order_total_products;
 
-        return Array('order_total_discount' => $order_total_discount,
+        return array('order_total_discount' => $order_total_discount,
             'split' => $split, 'shipping' => $shipping);
     }
 
@@ -296,10 +300,9 @@ class InvoiceService
             if (!$psFa) {
                 if ($statusToSubmitInvoice == -1 || $statusToSubmitInvoice == $current_status) {
                     if ($this->saveInvoice($id_order)) {
-                        //array_push($id_orders, $id_order);
                         $updateCount++;
 
-                        if ($statusToSubmitPayment == -1 || $statusToSubmitPayment == $current_status)
+                        if ($statusToSubmitPayment == $current_status)
                             $receiptService->saveReceipt($id_order);
 
                         // set return invoice
@@ -338,10 +341,11 @@ class InvoiceService
         return false;
     }
 
-    public function clearLink($orderId) {
+    public function clearLink($orderId)
+    {
         $psFaService = new PsFaService();
         $psFa = $psFaService->getPsFa('order', $orderId);
-        if($psFa)
+        if ($psFa)
             $psFaService->delete($psFa);
 
         $hesabfaApiService = new HesabfaApiService(new SettingService());
