@@ -48,13 +48,13 @@ class ReceiptService
 
                 if ($response->Success) {
                     $ok = true;
-                    LogService::writeLogStr("Hesabfa invoice payment added. order id: $id_order");
+                    LogService::writeLogStr("Hesabfa invoice receipt added. order id: $id_order");
                 } else {
-                    $msg = 'Cannot add Hesabfa Invoice payment. Error Message: ' . $response->ErrorMessage . ', Error code: ' . $response->ErrorCode . ', order id: ' . $id_order;
+                    $msg = 'Cannot add Hesabfa Invoice receipt. Error Message: ' . $response->ErrorMessage . ', Error code: ' . $response->ErrorCode . ', order id: ' . $id_order;
                     LogService::writeLogStr($msg);
                 }
             } else {
-                LogService::writeLogStr('Cannot add Hesabfa Invoice payment - Bank Code not defined. order id: ' . $id_order);
+                LogService::writeLogStr('Cannot add Hesabfa Invoice receipt - Bank Code not defined. order id: ' . $id_order);
             }
         }
 
@@ -112,13 +112,12 @@ class ReceiptService
         $result["error"] = false;
         $rpp = 10;
 
-        if (!isset($from_date) || empty($from_date)) {
-            $result['error'] = true;
-            $result['errorMessage'] = 'Error: Enter correct date.';
-            return $result;
-        }
-
         if ($batch == 1) {
+            if (!isset($from_date) || empty($from_date)) {
+                $result['error'] = true;
+                $result['errorMessage'] = 'Error: Enter correct date.';
+                return $result;
+            }
             if (!$this->isDateInFiscalYear($from_date)) {
                 $result['error'] = true;
                 $result['errorMessage'] = 'Error: Selected date is not in Hesabfa financial year.';
@@ -147,8 +146,8 @@ class ReceiptService
                 $current_status = $order->current_state;
 
                 if ($statusToSubmitPayment == -1 || $statusToSubmitPayment == $current_status) {
-                    $this->saveReceipt($id_order);
-                    $updateCount++;
+                    if ($this->saveReceipt($id_order))
+                        $updateCount++;
                 }
             }
         }
