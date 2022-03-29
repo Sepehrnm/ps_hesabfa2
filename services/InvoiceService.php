@@ -92,7 +92,7 @@ class InvoiceService
                 $discount = $order_total_discount - $total_discounts;
             } else {
                 $discount = ($product_price * $split * $product['product_quantity']);
-                $total_discounts += $discount;
+                $total_discounts += round($discount);
             }
 
             //$reduction_amount = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'] - $product['product_price'], $order);
@@ -103,17 +103,13 @@ class InvoiceService
                 $discount = $product_price * $product['product_quantity'];
             }
 
-            LogService::writeLogStr("=========================");
-            LogService::writeLogStr("item discount: " . $discount);
-            LogService::writeLogStr("=========================");
-
             $item = array(
                 'RowNumber' => $i,
                 'ItemCode' => (int)$code,
                 'Description' => $product['product_name'],
                 'Quantity' => (int)$product['product_quantity'],
                 'UnitPrice' => (float)$product_price,
-                'Discount' => (float)$discount,
+                'Discount' => round((float)$discount),
                 'Tax' => (float)$this->getOrderPriceInHesabfaDefaultCurrency(($product['unit_price_tax_incl'] - $product['unit_price_tax_excl']), $order),
             );
             array_push($items, $item);
