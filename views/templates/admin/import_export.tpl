@@ -123,9 +123,7 @@
                 });
             });
         </script>
-        <span class="input-group-addon">
-                                    <i class="icon-calendar-empty"></i>
-                                </span>
+        <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
     </div>
     <button class="btn btn-primary" id="hesabfa_export_orders" style="margin-top: 5px;">{l s='Export orders' mod='ps_hesabfa'}</button>
 </div>
@@ -423,7 +421,7 @@
                         $('#exportReceiptsProgressBar').css('width', progress + '%').attr('aria-valuenow', progress);
                         setTimeout(()=> {
                             exportReceipts(res.batch + 1, res.totalBatch, res.total, res.updateCount);
-                        }, 3000);
+                        }, 5000);
                         return false;
                     } else {
                         $('#exportReceiptsProgressBar').css('width', 100 + '%').attr('aria-valuenow', 100);

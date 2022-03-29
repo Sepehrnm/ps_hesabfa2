@@ -141,15 +141,17 @@ class ReceiptService
             $id_order = $orderDbRow["id_order"];
 
             $psFa = $psFaService->getPsFa('order', $id_order);
-            if ($psFa) {
-                $order = new Order($id_order);
-                $current_status = $order->current_state;
+            if (!$psFa) continue;
+            $order = new Order($id_order);
+            if (!$order) continue;
 
-                if ($statusToSubmitPayment == -1 || $statusToSubmitPayment == $current_status) {
-                    if ($this->saveReceipt($id_order))
-                        $updateCount++;
-                }
+            $targetStatus = $order->getHistory($order->id_lang, $statusToSubmitPayment, false);
+
+            if ($statusToSubmitPayment == -1 || count($targetStatus) > 0) {
+                if ($this->saveReceipt($id_order))
+                    $updateCount++;
             }
+
         }
 
         $result["batch"] = $batch;
