@@ -80,14 +80,16 @@ class InvoiceService
         $i = 0;
         $total_discounts = 0;
 
+        $result = $this->checkForPackProducts($products);
+        $products = $result[0];
+        $order_total_discount += $result[1];
+
         foreach ($products as $key => $product) {
             $code = $psFaService->getProductCodeByPrestaId($product['product_id'], $product['product_attribute_id']);
 
             //fix remaining discount amount on last item
             $array_key = array_keys($products);
-//            $product_price = $this->getOrderPriceInHesabfaDefaultCurrency($product['original_product_price'], $order);
             $product_price = $this->getOrderPriceInHesabfaDefaultCurrency($product['product_price'], $order);
-
             if (end($array_key) == $key) {
                 $discount = $order_total_discount - $total_discounts;
             } else {
@@ -354,6 +356,49 @@ class InvoiceService
             LogService::writeLogStr("Cannot remove order link with hesabfa invoice. Error Code: " . (string)$response->ErrorCode . ". Error Message: $response->ErrorMessage.");
             return false;
         }
+    }
+
+    private function checkForPackProducts($products)
+    {
+        $finalProducts = [];
+        $addToDiscount = 0;
+        foreach ($products as $key => $product) {
+            if (Pack::isPack($product['product_id'])) {
+                $itemsInPack = Pack::getItems($product['product_id'], $this->idLang);
+                $result = $this->convertPackItemsToOrderItems($itemsInPack, $product);
+                array_push($finalProducts, ...$result[0]);
+                $addToDiscount += $result[1];
+            } else
+                $finalProducts[] = $product;
+        }
+        return array($finalProducts, $addToDiscount);
+    }
+
+    private function convertPackItemsToOrderItems($itemsInPack, $orderItem) {
+        $orderItems = [];
+        $numItems = count($itemsInPack);
+        $i=0;
+        $sumItems = 0;
+        foreach ($itemsInPack as $item) {
+            $product = array();
+            $product['product_id'] = $item->id;
+            $product['product_attribute_id'] = $item->id_pack_product_attribute;
+            $product['product_price'] = $item->price;
+            $product['product_quantity'] = $orderItem['product_quantity'] * $item->pack_quantity;
+            $product['product_name'] = $item->name;
+            if(++$i === $numItems) {
+                $product['unit_price_tax_incl'] = $orderItem['unit_price_tax_incl'];
+                $product['unit_price_tax_excl'] = $orderItem['unit_price_tax_excl'];
+            }
+            $orderItems[] = $product;
+            $sumItems += ($item->price * $item->pack_quantity) * $orderItem['product_quantity'];
+        }
+
+        //LogService::writeLogObj($orderItems);
+
+        $addToDiscount = $sumItems - ($orderItem['product_price'] * $orderItem['product_quantity']);
+
+        return array($orderItems, $addToDiscount);
     }
 
 }
