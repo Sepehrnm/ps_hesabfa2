@@ -55,7 +55,7 @@ class CustomerService
         $country = '';
         if ($addressId > 0) {
             $address = new Address($addressId);
-            $PostalCode = mb_substr(preg_replace("/[^0-9]/", '', $address->postcode), 0, 9);
+            $PostalCode = mb_substr(preg_replace("/[^0-9]/", '', $address->postcode), 0, 10);
             $state = State::getNameById($address->id_state) == false ? null : State::getNameById($address->id_state);
             $country = Country::getNameById($this->idLang, $address->id_country) == false ? null : Country::getNameById($this->idLang, $address->id_country);
         }
@@ -150,6 +150,7 @@ class CustomerService
     {
         LogService::writeLogStr("===== Export Customers: part $batch =====");
         $psFaService = new PsFaService();
+        $db = Db::getInstance();
 
         $result = array();
         $result["error"] = false;
@@ -163,7 +164,7 @@ class CustomerService
 
         $offset = ($batch - 1) * $rpp;
         $sql = "SELECT id_customer FROM `" . _DB_PREFIX_ . "customer` ORDER BY 'id_customer' ASC LIMIT $offset,$rpp";
-        $customers = Db::getInstance()->executeS($sql);
+        $customers = $db->executeS($sql);
         $contacts = array();
 
         foreach ($customers as $customer) {
@@ -172,7 +173,12 @@ class CustomerService
 
             $id_obj = $psFaService->getPsFaId('customer', $id_customer, 0);
             if (!$id_obj) {
-                $hesabfaContact = $this->mapCustomer($customer, $id_customer);
+                // get customer address id if available
+                $sql2 = "SELECT id_address FROM `" . _DB_PREFIX_ . "address` WHERE id_customer = $id_customer AND active = 1 AND deleted = 0";
+                $addresses = $db->executeS($sql2);
+                $addressId = $addresses && count($addresses) > 0 ? $addresses[0]["id_address"] : 0;
+
+                $hesabfaContact = $this->mapCustomer($customer, $id_customer, true, $addressId);
                 array_push($contacts, $hesabfaContact);
                 $updateCount++;
             }

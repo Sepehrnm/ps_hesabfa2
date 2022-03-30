@@ -104,7 +104,7 @@ class ReceiptService
 
     public function exportReceipts($batch, $totalBatch, $total, $updateCount, $from_date)
     {
-        LogService::writeLogStr("===== Export Invoice Receipts =====");
+        LogService::writeLogStr("===== Export Invoice Receipts: part $batch =====");
         $settingService = new SettingService();
         $statusToSubmitPayment = $settingService->getInWhichStatusAddPaymentReceipt();
 
