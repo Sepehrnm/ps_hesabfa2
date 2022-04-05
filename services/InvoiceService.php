@@ -394,8 +394,6 @@ class InvoiceService
             $sumItems += ($item->price * $item->pack_quantity) * $orderItem['product_quantity'];
         }
 
-        //LogService::writeLogObj($orderItems);
-
         $addToDiscount = $sumItems - ($orderItem['product_price'] * $orderItem['product_quantity']);
 
         return array($orderItems, $addToDiscount);

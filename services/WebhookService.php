@@ -233,9 +233,10 @@ class WebhookService
         $psFa = $psFaService->getPsFa('product', $id_product, $id_attribute);
 
         if ($psFa) {
-            //ToDo: if product not exists in PS then return
             $product = new Product($id_product);
             if(!$product)
+                return false;
+            if(Pack::isPack($id_product))
                 return false;
 
             //1.set new Price

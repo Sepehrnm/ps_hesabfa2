@@ -22,6 +22,8 @@ class ProductService
 
         $items = array();
         foreach ($productIdArray as $productId) {
+            if (Pack::isPack($productId))
+                continue;
             $product = new Product($productId);
 
             // set base product
@@ -272,7 +274,10 @@ class ProductService
             $id_product = (int)$item["id_product"];
             $product = new Product($id_product);
 
-            // Set base product
+            if(Pack::isPack($id_product))
+                continue;
+
+                // Set base product
             $id_obj = $psFaService->getPsFaId('product', $id_product, 0);
             if (!$id_obj) {
                 $hesabfaItem = $this->mapProduct($product, $id_product);
@@ -338,6 +343,9 @@ class ProductService
         foreach ($products as $item) {
             $id_product = (int)$item["id_product"];
             $product = new Product($id_product);
+
+            if(Pack::isPack($id_product))
+                continue;
 
             if ($product->hasAttributes() == 0) {
                 $obj = $psFaService->getPsFa('product', $id_product, 0);
@@ -431,7 +439,5 @@ class ProductService
         $result["total"] = $total;
         return $result;
     }
-
-
 
 }
