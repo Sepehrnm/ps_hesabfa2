@@ -76,7 +76,7 @@ class CustomerService
 
             'NationalCode' => $address != null ? $address->dni : '',
             'EconomicCode' => $address != null ? $address->vat_number : '',
-            'Address' => $address != null ? $address->address1 . ' ' . $address->address2 : '',
+            'Address' => $address != null ? substr($address->address1 . ' ' . $address->address2, 0 , 150) : '',
             'City' => $address != null ? $address->city : '',
             'State' => $state,
             'Country' => $country,

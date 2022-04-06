@@ -39,7 +39,7 @@ class ProductService
         }
 
         if (count($items) === 0)
-            return false;
+            return true;
 
         if (!$this->saveProductsToHesabfa($items))
             return false;
