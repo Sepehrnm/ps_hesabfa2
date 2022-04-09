@@ -153,8 +153,6 @@ class InvoiceService
         if ($reference === null)
             $reference = $settingService->getWhichNumberSetAsInvoiceReference() ? $order->reference : $orderId;
 
-        LogService::writeLogStr("customer id: " . $order->id_customer);
-
         return array(
             'Number' => $psFaService->getInvoiceCodeByPrestaId($orderId),
             'InvoiceType' => $orderType,
@@ -212,8 +210,6 @@ class InvoiceService
         $order_total_discount = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_discounts, $order);
         $shipping = $this->getOrderPriceInHesabfaDefaultCurrency($order->total_shipping_tax_incl, $order);
 
-        LogService::writeLogStr("order->total_shipping_tax_incl:" . $order->total_shipping_tax_incl);
-
         $sql = 'SELECT `free_shipping` 
                     FROM `' . _DB_PREFIX_ . 'order_cart_rule`
                     WHERE `id_order` = ' . $orderId;
@@ -246,10 +242,8 @@ class InvoiceService
         return $price;
     }
 
-    public function exportOrders($batch, $totalBatch, $total, $updateCount, $from_date)
+    public function exportOrders($batch, $totalBatch, $total, $updateCount, $from_date, $overwrite)
     {
-        LogService::writeLogStr("===== Export Orders =====");
-
         $result = array();
         $result["error"] = false;
         $rpp = 10;
@@ -259,7 +253,6 @@ class InvoiceService
             $result['errorMessage'] = 'Error: Enter correct date.';
             return $result;
         }
-
         if (!$this->isDateInFiscalYear($from_date)) {
             $result['error'] = true;
             $result['errorMessage'] = 'Error: Selected date is not in Hesabfa financial year.';
@@ -267,58 +260,82 @@ class InvoiceService
         }
 
         if ($batch == 1) {
-            $sql = "SELECT COUNT(*) FROM `" . _DB_PREFIX_ . "orders` WHERE date_add >= '" . $from_date . "'";
-            $total = (int)Db::getInstance()->getValue($sql);
+            $total = $this->getTotalOrders($from_date);
             $totalBatch = ceil($total / $rpp);
         }
+        LogService::writeLogStr("===== Export Orders: part $batch of $totalBatch =====");
 
         $offset = ($batch - 1) * $rpp;
-        $sql = "SELECT id_order FROM `" . _DB_PREFIX_ . "orders`
-                                WHERE date_add >= '" . $from_date . "'
-                                ORDER BY id_order ASC LIMIT $offset,$rpp";
-        $orders = Db::getInstance()->executeS($sql);
+        $orders = $this->getOrdersId($from_date, $offset, $rpp);
 
-        // implement below
-        $settingService = new SettingService();
         $psFaService = new PsFaService();
         $receiptService = new ReceiptService($this->module);
+        $settings = $this->getSettingsForExportOrders();
+        $settings["overwrite"] = $overwrite == 'true';
 
-        $statusToSubmitInvoice = $settingService->getInWhichStatusAddInvoiceToHesabfa();
-        $statusToSubmitReturnInvoice = $settingService->getInWhichStatusAddReturnInvoiceToHesabfa();
-        $statusToSubmitPayment = $settingService->getInWhichStatusAddPaymentReceipt();
-
-        //$id_orders = array();
-        foreach ($orders as $orderDbRow) {
-            $order = new Order($orderDbRow["id_order"]);
-            $id_order = $orderDbRow["id_order"];
-
-            $psFa = $psFaService->getPsFa('order', $id_order);
-            $current_status = $order->current_state;
-
-            if (!$psFa) {
-                if ($statusToSubmitInvoice == -1 || $statusToSubmitInvoice == $current_status) {
-                    if ($this->saveInvoice($id_order)) {
-                        $updateCount++;
-
-                        if ($statusToSubmitPayment == $current_status)
-                            $receiptService->saveReceipt($id_order);
-
-                        // set return invoice
-                        if ($statusToSubmitReturnInvoice == $current_status) {
-                            $psFa = $psFaService->getPsFa('order', $id_order);
-                            $this->saveInvoice($id_order, 2, $psFa->idHesabfa);
-                        }
-                    }
-                }
-            }
-
-        }
+        foreach ($orders as $orderDbRow)
+            $updateCount += $this->exportOrder($orderDbRow, $psFaService, $receiptService, $settings);
 
         $result["batch"] = $batch;
         $result["totalBatch"] = $totalBatch;
         $result["total"] = $total;
         $result["updateCount"] = $updateCount;
         return $result;
+    }
+
+    private function exportOrder($orderDbRow, $psFaService, $receiptService, $settings) {
+        $id_order = $orderDbRow["id_order"];
+        $order = new Order($id_order);
+        $updateCount = 0;
+
+        if(!$settings["overwrite"]) {
+            $psFa = $psFaService->getPsFa('order', $id_order);
+            if($psFa)
+                return $updateCount;
+        }
+
+        $targetStatusInvoice = $order->getHistory($order->id_lang, $settings["statusToSubmitInvoice"], false);
+        if ($settings["statusToSubmitInvoice"] == -1 || count($targetStatusInvoice) > 0) {
+            if ($this->saveInvoice($id_order)) {
+                $updateCount++;
+
+                $targetStatusPayment = $order->getHistory($order->id_lang, $settings["statusToSubmitPayment"], false);
+                if ($settings["statusToSubmitPayment"] == -1 || count($targetStatusPayment) > 0)
+                    $receiptService->saveReceipt($id_order);
+
+                $targetStatusReturnInvoice = $order->getHistory($order->id_lang, $settings["statusToSubmitReturnInvoice"], false);
+                if (count($targetStatusReturnInvoice) > 0) {
+                    $psFa = $psFaService->getPsFa('order', $id_order);
+                    $this->saveInvoice($id_order, 2, $psFa->idHesabfa);
+                }
+            }
+        }
+
+        return $updateCount;
+    }
+
+    private function getTotalOrders($from_date)
+    {
+        $sql = "SELECT COUNT(*) FROM `" . _DB_PREFIX_ . "orders` WHERE date_add >= '" . $from_date . "'";
+        return (int)Db::getInstance()->getValue($sql);
+    }
+
+    private function getOrdersId($from_date, $offset, $rpp)
+    {
+        $sql = "SELECT id_order FROM `" . _DB_PREFIX_ . "orders`
+                                WHERE date_add >= '" . $from_date . "'
+                                ORDER BY id_order ASC LIMIT $offset,$rpp";
+        return Db::getInstance()->executeS($sql);
+    }
+
+    private function getSettingsForExportOrders() {
+        $settingService = new SettingService();
+        $statusToSubmitInvoice = $settingService->getInWhichStatusAddInvoiceToHesabfa();
+        $statusToSubmitReturnInvoice = $settingService->getInWhichStatusAddReturnInvoiceToHesabfa();
+        $statusToSubmitPayment = $settingService->getInWhichStatusAddPaymentReceipt();
+        return array("statusToSubmitInvoice" => $statusToSubmitInvoice,
+            "statusToSubmitReturnInvoice" => $statusToSubmitReturnInvoice,
+            "statusToSubmitPayment" => $statusToSubmitPayment);
     }
 
     public function isDateInFiscalYear($date)
@@ -398,5 +415,7 @@ class InvoiceService
 
         return array($orderItems, $addToDiscount);
     }
+
+
 
 }

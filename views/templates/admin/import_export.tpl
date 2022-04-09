@@ -101,6 +101,10 @@
                 <li>با انجام این عملیات سفارشات فروشگاه که در حسابفا ثبت نشده اند از تاریخ انتخاب شده بررسی و در
                     حسابفا ثبت می شوند.
                 </li>
+                <li>
+                    علاوه بر فاکتور، رسید دریافت فاکتور و فاکتور برگشت از فروش نیز با توجه به وضعیت سفارش و
+                    تنظیمات مربوطه ثبت می شوند.
+                </li>
                 <li>توجه کنید که بصورت نرمال با فعالسازی افزونه و تکمیل تنظیمات API
                     این همسان سازی بصورت خودکار انجام می شود و این گزینه صرفاْ برای مواقعی است که به دلایل فنی
                     مثل قطع اتصال فروشگاه با حسابفا و یا خطا و باگ این همسان سازی صورت نگرفته است.
@@ -108,22 +112,32 @@
                 <li>
                     تاریخ انتخاب شده باید در بازه آخرین سال مالی در حسابفا باشد.
                 </li>
+                <li>
+                    با انتخاب گزینه ثبت مجدد تمام فاکتورها، فاکتورهایی که قبلاً ثبت شده اند نیز مجدداً بر روی فاکتور قبل
+                    ثبت و ویرایش می شوند.
+                </li>
             </ul>
-
         </div>
     </div>
-    <div class="input-group" style="max-width: 150px;">
-        <input class="datetimepicker" type="text" id="hesabfa_sync_order_date" name="hesabfa_sync_order_date">
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $(".datetimepicker").datepicker({
-                    prevText: '',
-                    nextText: '',
-                    dateFormat: 'yy-mm-dd'
-                });
-            });
-        </script>
-        <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
+    <div class="row">
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <div class="input-group" style="max-width: 150px;">
+                <input class="datetimepicker" type="text" id="hesabfa_sync_order_date" name="hesabfa_sync_order_date">
+                <script type="text/javascript">
+                    $(document).ready(function(){
+                        $(".datetimepicker").datepicker({
+                            prevText: '',
+                            nextText: '',
+                            dateFormat: 'yy-mm-dd'
+                        });
+                    });
+                </script>
+                <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-3 col-md-3">
+            <input type="checkbox" id="hesabfa_sync_order_overwrite"> {l s='Overwrite all invoices' mod='ps_hesabfa'}
+        </div>
     </div>
     <button class="btn btn-primary" id="hesabfa_export_orders" style="margin-top: 5px;">{l s='Export orders' mod='ps_hesabfa'}</button>
 </div>
@@ -348,7 +362,8 @@
                 'total': total,
                 'updateCount': updateCount,
                 'token': token,
-                'date': $('#hesabfa_sync_order_date').val()
+                'date': $('#hesabfa_sync_order_date').val(),
+                'overwrite': $('#hesabfa_sync_order_overwrite').prop('checked'),
             };
             $.post('index.php', data, function (response) {
                 if (response !== 'failed') {
@@ -366,7 +381,9 @@
                         let progress = (res.batch * 100) / res.totalBatch;
                         progress = Math.round(progress);
                         $('#exportOrdersProgressBar').css('width', progress + '%').attr('aria-valuenow', progress);
-                        exportOrders(res.batch + 1, res.totalBatch, res.total, res.updateCount);
+                        setTimeout(()=> {
+                            exportOrders(res.batch + 1, res.totalBatch, res.total, res.updateCount);
+                        }, 3000);
                         return false;
                     } else {
                         $('#exportOrdersProgressBar').css('width', 100 + '%').attr('aria-valuenow', 100);

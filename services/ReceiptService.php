@@ -104,7 +104,6 @@ class ReceiptService
 
     public function exportReceipts($batch, $totalBatch, $total, $updateCount, $from_date)
     {
-        LogService::writeLogStr("===== Export Invoice Receipts: part $batch =====");
         $settingService = new SettingService();
         $statusToSubmitPayment = $settingService->getInWhichStatusAddPaymentReceipt();
 
@@ -128,6 +127,7 @@ class ReceiptService
             $total = (int)Db::getInstance()->getValue($sql);
             $totalBatch = ceil($total / $rpp);
         }
+        LogService::writeLogStr("===== Export Invoice Receipts: part $batch of $totalBatch =====");
 
         $offset = ($batch - 1) * $rpp;
         $sql = "SELECT id_order FROM `" . _DB_PREFIX_ . "orders`

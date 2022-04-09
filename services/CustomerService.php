@@ -148,7 +148,6 @@ class CustomerService
 
     public function exportCustomers($batch, $totalBatch, $total, $updateCount)
     {
-        LogService::writeLogStr("===== Export Customers: part $batch =====");
         $psFaService = new PsFaService();
         $db = Db::getInstance();
 
@@ -161,6 +160,7 @@ class CustomerService
             $total = (int)Db::getInstance()->getValue($sql);
             $totalBatch = ceil($total / $rpp);
         }
+        LogService::writeLogStr("===== Export Customers: part $batch of $totalBatch =====");
 
         $offset = ($batch - 1) * $rpp;
         $sql = "SELECT id_customer FROM `" . _DB_PREFIX_ . "customer` ORDER BY 'id_customer' ASC LIMIT $offset,$rpp";

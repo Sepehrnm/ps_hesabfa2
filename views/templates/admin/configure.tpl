@@ -57,12 +57,10 @@
 
 <div class="panel">
 	<h3><i class="icon icon-tags"></i> {l s='Documentation' mod='ps_hesabfa'}</h3>
-	<p>
-		&raquo; {l s='Click on the link below to view the manual of this module' mod='ps_hesabfa'} :
 		<ul>
 			<li><a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank">{l s='Hesabfa Module Help' mod='ps_hesabfa'}</a></li>
+			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.19)</a></li>
 		</ul>
-	</p>
 </div>
 
 {if $showBusinessInfo eq true}
@@ -81,7 +79,36 @@
 	</div>
 {/if}
 
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-last-changes">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.19)</h4>
+			</div>
+			<div class="modal-body">
+				<ul>
+					<li>باز کردن کالاهای پک (بسته محصولات) در هنگام ثبت فاکتور در حسابفا</li>
+					<li>امکان صدور رسید فاکتورها به حسابفا بصورت گروهی در صفحه ورود و خروج</li>
+					<li>تغییر تنظیمات رسید: از این نسخه به بعد رسید فاکتورها فقط در یک بانک قابل ثبت است که باید در تنظیمات انتخاب گردد.</li>
+					<li>رفع باگ ثبت آدرس مشتریان در هنگام صدور گروهی مشتریان به حسابفا</li>
+					<li>رفع باگ فاکتورهای تخفیف دار</li>
+					<li>رفع مشکل ثبت مجدد رسید فاکتورها</li>
+					<li>رفع مشکل timeout شدن صدور گروهی کالاها در فروشگاه های با تعداد کالاهای بسیار زیاد</li>
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close' mod='ps_hesabfa'}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
+	function showLastChanges() {
+		$('#modal-last-changes').modal('show');
+	}
+
 	jQuery(function ($) {
 		$('#hesabfa-delete-plugin').click(function () {
 
@@ -118,5 +145,11 @@
 			}
 			return false;
 		});
+
+		let version = localStorage.getItem('hesabfa-plugin-version');
+		if(!version || +version.replaceAll('.', '') < +'2.0.19'.replaceAll('.', '')) {
+			localStorage.setItem('hesabfa-plugin-version', '2.0.19');
+			showLastChanges();
+		}
 	});
 </script>

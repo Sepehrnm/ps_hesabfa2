@@ -2,7 +2,7 @@
 <module>
     <name>ps_hesabfa</name>
     <displayName><![CDATA[حسابفا]]></displayName>
-    <version><![CDATA[2.0.18]]></version>
+    <version><![CDATA[2.0.19]]></version>
     <description><![CDATA[نرم افزار حسابداری آنلاین حسابفا]]></description>
     <author><![CDATA[Hesabfa]]></author>
     <tab><![CDATA[administration]]></tab>
