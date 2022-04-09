@@ -59,7 +59,7 @@
 	<h3><i class="icon icon-tags"></i> {l s='Documentation' mod='ps_hesabfa'}</h3>
 		<ul>
 			<li><a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank">{l s='Hesabfa Module Help' mod='ps_hesabfa'}</a></li>
-			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.19)</a></li>
+			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.20)</a></li>
 		</ul>
 </div>
 
@@ -84,7 +84,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.19)</h4>
+				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.20)</h4>
 			</div>
 			<div class="modal-body">
 				<ul>
@@ -147,8 +147,8 @@
 		});
 
 		let version = localStorage.getItem('hesabfa-plugin-version');
-		if(!version || +version.replaceAll('.', '') < +'2.0.19'.replaceAll('.', '')) {
-			localStorage.setItem('hesabfa-plugin-version', '2.0.19');
+		if(!version || +version.replaceAll('.', '') < +'2.0.20'.replaceAll('.', '')) {
+			localStorage.setItem('hesabfa-plugin-version', '2.0.20');
 			showLastChanges();
 		}
 	});
