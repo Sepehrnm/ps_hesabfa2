@@ -53,11 +53,15 @@ class CustomerService
         $PostalCode = '';
         $state = '';
         $country = '';
+        $postAddress = '';
         if ($addressId > 0) {
             $address = new Address($addressId);
-            $PostalCode = mb_substr(preg_replace("/[^0-9]/", '', $address->postcode), 0, 10);
-            $state = State::getNameById($address->id_state) == false ? null : State::getNameById($address->id_state);
-            $country = Country::getNameById($this->idLang, $address->id_country) == false ? null : Country::getNameById($this->idLang, $address->id_country);
+            if($address) {
+                $PostalCode = mb_substr(preg_replace("/[^0-9]/", '', $address->postcode), 0, 10);
+                $state = State::getNameById($address->id_state) == false ? null : State::getNameById($address->id_state);
+                $country = Country::getNameById($this->idLang, $address->id_country) == false ? null : Country::getNameById($this->idLang, $address->id_country);
+                $postAddress = mb_substr($address->address1 . ' ' . $address->address2, 0, 150,"UTF-8");
+            }
         }
 
         $settingService = new SettingService();
@@ -76,7 +80,7 @@ class CustomerService
 
             'NationalCode' => $address != null ? $address->dni : '',
             'EconomicCode' => $address != null ? $address->vat_number : '',
-            'Address' => $address != null ? substr($address->address1 . ' ' . $address->address2, 0 , 150) : '',
+            'Address' => $postAddress,
             'City' => $address != null ? $address->city : '',
             'State' => $state,
             'Country' => $country,

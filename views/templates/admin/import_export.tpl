@@ -383,7 +383,7 @@
                         $('#exportOrdersProgressBar').css('width', progress + '%').attr('aria-valuenow', progress);
                         setTimeout(()=> {
                             exportOrders(res.batch + 1, res.totalBatch, res.total, res.updateCount);
-                        }, 3000);
+                        }, 5000);
                         return false;
                     } else {
                         $('#exportOrdersProgressBar').css('width', 100 + '%').attr('aria-valuenow', 100);
