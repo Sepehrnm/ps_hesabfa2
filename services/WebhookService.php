@@ -336,13 +336,13 @@ class WebhookService
 
     public function getObjectsByCodeList($codeList) {
         $queryInfo = array(
+            'Take' => 10000,
             'Filters' => array(array(
                 'Property' => 'Code',
                 'Operator' => 'in',
                 'Value' => $codeList,
             ))
         );
-
         $hesabfaApi = new HesabfaApiService(new SettingService());
         $result = $hesabfaApi->itemGetItems($queryInfo);
 
