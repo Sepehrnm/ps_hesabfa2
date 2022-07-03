@@ -594,10 +594,10 @@ class Ps_hesabfa extends Module
         $settingService = new SettingService();
         $settingStatus = $settingService->getInWhichStatusAddInvoiceToHesabfa();
         $settingStatusReceipt = $settingService->getInWhichStatusAddPaymentReceipt();
+        $psFaService = new PsFaService();
+        $psFa = $psFaService->getPsFa('order', (int)$params['id_order']);
 
         if ($settingStatus == -1 || $params["newOrderStatus"]->id == $settingStatus) {
-            $psFaService = new PsFaService();
-            $psFa = $psFaService->getPsFa('order', (int)$params['id_order']);
             if (!$psFa) {
                 $success = $invoiceService->saveInvoice((int)$params['id_order']);
                 if ($success) {
@@ -605,6 +605,13 @@ class Ps_hesabfa extends Module
                         $receiptService = new ReceiptService($this);
                         $receiptService->saveReceipt($params['id_order']);
                     }
+                }
+            }
+        } else {
+            if ($psFa) {
+                if ($settingStatusReceipt == -1 || $params["newOrderStatus"]->id == $settingStatusReceipt) {
+                    $receiptService = new ReceiptService($this);
+                    $receiptService->saveReceipt($params['id_order']);
                 }
             }
         }
