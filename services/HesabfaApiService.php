@@ -310,11 +310,11 @@ class HesabfaApiService implements IHesabfaApiService
         return $this->apiRequest($method, $data);
     }
 
-    public function invoiceGetById($id)
+    public function invoiceGetById($idList)
     {
         $method = 'invoice/getById';
         $data = array(
-            'idList' => $id,
+            'idList' => $idList,
         );
 
         return $this->apiRequest($method, $data);

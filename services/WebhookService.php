@@ -26,6 +26,13 @@ class WebhookService
                 if (!$item->API) {
                     switch ($item->ObjectType) {
                         case 'Invoice':
+                            if ($item->Action == 123) { // delete invoice link
+                                $psFa = $psFaService->getPsFaByHesabfaId('order', $item->Extra2);
+                                if($psFa)
+                                    $psFaService->delete($psFa);
+                                break;
+                            }
+
                             $this->invoicesObjectId[] = $item->ObjectId;
                             foreach (explode(',', $item->Extra) as $invoiceItem) {
                                 if ($invoiceItem != ''){
@@ -35,8 +42,7 @@ class WebhookService
 
                             break;
                         case 'Product':
-                            //if Action was deleted
-                            if ($item->Action == 53) {
+                            if ($item->Action == 53) { // delete product link
                                 $psFa = $psFaService->getPsFaByHesabfaId('product', $item->Extra);
                                 if($psFa)
                                     $psFaService->delete($psFa);
@@ -46,8 +52,7 @@ class WebhookService
                             $this->itemsObjectId[] = $item->ObjectId;
                             break;
                         case 'Contact':
-                            //if Action was deleted
-                            if ($item->Action == 33) {
+                            if ($item->Action == 33) { // delete contact link
                                 $psFa = $psFaService->getPsFaByHesabfaId('customer', $item->Extra);
                                 if($psFa)
                                     $psFaService->delete($psFa);
