@@ -28,8 +28,10 @@ class WebhookService
                         case 'Invoice':
                             if ($item->Action == 123) { // delete invoice link
                                 $psFa = $psFaService->getPsFaByHesabfaId('order', $item->Extra2);
-                                if($psFa)
+                                if($psFa) {
                                     $psFaService->delete($psFa);
+                                    LogService::writeLogStr('Invoice link deleted, invoice number: ' . $item->Extra2);
+                                }
                                 break;
                             }
 
