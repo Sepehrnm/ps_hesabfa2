@@ -39,7 +39,7 @@ For more information and a full guide to how to use Hesabfa and WooCommerce Plug
 * Fixing the problem of timeout of group issuing of goods in stores with a large number of goods
 * Fixed the bug of updating invoices with more than 10 items
 
-= 2.0.28 - 00.00.2023 =
+= 2.0.28 - 05.07.2023 =
 * Expire Date bug fixed
 * API address options deleted
 * Add cash as a payment method in settings
