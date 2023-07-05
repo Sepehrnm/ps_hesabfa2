@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2021 PrestaShop
+ * 2007-2023 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2021 PrestaShop SA
+ * @copyright 2007-2023 PrestaShop SA
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -50,7 +50,7 @@ class Ps_hesabfa extends Module
     {
         $this->name = 'ps_hesabfa';
         $this->tab = 'administration';
-        $this->version = '2.0.27';
+        $this->version = '2.0.28';
         $this->author = 'Hesabfa';
         $this->need_instance = 0;
 
@@ -154,11 +154,13 @@ class Ps_hesabfa extends Module
 
         if ($apiKey && $apiToken) {
             $result = $apiService->settingGetSubscriptionInfo();
+            $newExpireDate = (str_replace('-', '/', substr($result->Result->ExpireDate, 0, 10)));
+
             if ($result->Success) {
                 $this->context->smarty->assign('showBusinessInfo', true);
                 $this->context->smarty->assign('businessName', $result->Result->Name);
                 $this->context->smarty->assign('subscription', $result->Result->Subscription);
-                $this->context->smarty->assign('expireDate', date("Y/m/d", $result->Result->ExpireDate));
+                $this->context->smarty->assign('expireDate', $newExpireDate);
                 $this->context->smarty->assign('documentCredit', $result->Result->Credit);
                 $this->context->smarty->assign('tokenHesabfaSettings', Tools::getAdminTokenLite('HesabfaSettings'));
                 $this->context->smarty->assign('tokenImportExport', Tools::getAdminTokenLite('ImportExport'));
@@ -281,17 +283,6 @@ class Ps_hesabfa extends Module
         $settingService = new SettingService();
         $connected = $settingService->getConnectionStatus();
 
-        $apiAddressOptions = array(
-            array(
-                'id_option' => 1,
-                'name' => 'Address 1 (Cloudflare)'
-            ),
-            array(
-                'id_option' => 2,
-                'name' => 'Address 2 (Arvancloud)'
-            ),
-        );
-
         return array(
             'form' => array(
                 'legend' => array(
@@ -311,24 +302,11 @@ class Ps_hesabfa extends Module
                     array(
                         'col' => 3,
                         'type' => 'text',
-                        'prefix' => '<i class="icon icon-token"></i>',
+                        'prefix' => '<i class="icon icon-link"></i>',
                         'desc' => $this->l('Enter Hesabfa API Token'),
                         'name' => 'PS_HESABFA_API_TOKEN',
                         'label' => $this->l('API Token'),
                         'disabled' => $connected
-                    ),
-                    array(
-                        'col' => 3,
-                        'type' => 'select',
-                        'prefix' => '<i class="icon icon-link"></i>',
-                        'desc' => $this->l('Select Hesabfa API address to use'),
-                        'name' => 'PS_HESABFA_API_ADDRESS',
-                        'label' => $this->l('API Address'),
-                        'options' => array(
-                            'query' => $apiAddressOptions,
-                            'id' => 'id_option',
-                            'name' => 'name'
-                        ),
                     ),
                 ),
                 'submit' => array(
@@ -348,7 +326,6 @@ class Ps_hesabfa extends Module
         return array(
             'PS_HESABFA_API_KEY' => $settingService->getApiKey(),
             'PS_HESABFA_API_TOKEN' => $settingService->getApiToken(),
-            'PS_HESABFA_API_ADDRESS' => $settingService->getApiAddress(),
         );
     }
 
@@ -360,13 +337,10 @@ class Ps_hesabfa extends Module
         $form_values = $this->getConfigFormValues();
         $apiKey = Tools::getValue('PS_HESABFA_API_KEY');
         $apiToken = Tools::getValue('PS_HESABFA_API_TOKEN');
-        $apiAddress = Tools::getValue('PS_HESABFA_API_ADDRESS');
 
         $settingService = new SettingService();
         if ($apiKey && $apiToken)
             $settingService->setApiKeyAndToken($apiKey, $apiToken);
-
-        $settingService->setApiAddress($apiAddress);
 
         // connect to Hesabfa
         $apiService = new HesabfaApiService($settingService);

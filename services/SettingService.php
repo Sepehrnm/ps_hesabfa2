@@ -12,10 +12,6 @@ interface ISettingService
 
     public function getApiToken();
 
-    public function getApiAddress();
-
-    public function setApiAddress($value);
-
     public function testApiConnection($apiKey, $apiToken);
 
     public function setInWhichStatusAddInvoiceToHesabfa($status);
@@ -133,14 +129,6 @@ class SettingService implements ISettingService
         return $this->getSetting("API_TOKEN");
     }
 
-    public function getApiAddress() {
-        return $this->getSetting("API_ADDRESS");
-    }
-
-    public function setApiAddress($value) {
-        $this->setSetting("API_ADDRESS", $value);
-    }
-
     public function testApiConnection($apiKey, $apiToken)
     {
         // TODO: Implement testApiConnection() method.
@@ -214,6 +202,26 @@ class SettingService implements ISettingService
     public function getPaymentReceiptDestination()
     {
         return $this->getSetting("PAYMENT_RECEIPT_DESTINATION");
+    }
+
+    public function setFreightOption($freightOption)
+    {
+        $this->setSetting("FREIGHT_INVOICE_OPTION", $freightOption);
+    }
+
+    public function getFreightOption()
+    {
+        return $this->getSetting("FREIGHT_INVOICE_OPTION");
+    }
+
+    public function setFreightValue($freightOption)
+    {
+        $this->setSetting("FREIGHT_INVOICE_VALUE", $freightOption);
+    }
+
+    public function getFreightValue()
+    {
+        return $this->getSetting("FREIGHT_INVOICE_VALUE");
     }
 
     public function setLastChangesLogId($value)

@@ -18,8 +18,7 @@ class ReceiptService
 
     public function saveReceipt($id_order)
     {
-        if (!isset($id_order))
-            return false;
+        if (!isset($id_order)) return false;
 
         $hesabfaApi = new HesabfaApiService(new SettingService());
         $invoiceService = new InvoiceService($this->module);
@@ -41,7 +40,7 @@ class ReceiptService
             if ($bank_code == -1)
                 return true;
             elseif ($bank_code != false) {
-                if ($payment->transaction_id == '') $payment->transaction_id = 'None';
+                if ($payment->transaction_id == '') $payment->transaction_id = '-';
 
                 $response = $hesabfaApi->invoiceSavePayment($invoiceNumber, $bank_code, $payment->date_add,
                     $invoiceService->getOrderPriceInHesabfaDefaultCurrency($payment->amount, $order), $payment->transaction_id);
@@ -54,7 +53,7 @@ class ReceiptService
                     LogService::writeLogStr($msg);
                 }
             } else {
-                LogService::writeLogStr('Cannot add Hesabfa Invoice receipt - Bank Code not defined. order id: ' . $id_order);
+                LogService::writeLogStr('Cannot add Hesabfa Invoice receipt - Bank or Cash Code is not defined. order id: ' . $id_order);
             }
         }
 

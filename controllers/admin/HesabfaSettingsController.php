@@ -30,7 +30,10 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('selectedInvoiceReference', $settingService->getWhichNumberSetAsInvoiceReference());
         $this->context->smarty->assign('tokenHesabfaModuleConfigure', Tools::getAdminTokenLite('AdminModules'));
 
-        LogService::writeLogStr($settingService->getUpdatePriceFromHesabfaToStore());
+        $this->context->smarty->assign('selectedFreightOption', $settingService->getFreightOption());
+        $this->context->smarty->assign('selectedFreightValue', $settingService->getFreightValue());
+
+//        LogService::writeLogStr($settingService->getUpdatePriceFromHesabfaToStore());
 
         $orderStatusOptions = array();
         $order_states = OrderState::getOrderStates(Context::getContext()->language->id);
@@ -52,6 +55,7 @@ class HesabfaSettingsController extends ModuleAdminController
         $banks = $this->getBanksInHesabfa();
 
         $this->context->smarty->assign('banks', $banks);
+
         $selectedBankId = $settingService->getPaymentReceiptDestination();
         $this->context->smarty->assign('selectedBankId', $selectedBankId);
 
@@ -83,7 +87,8 @@ class HesabfaSettingsController extends ModuleAdminController
         $settingService = new SettingService();
         $api = new HesabfaApiService($settingService);
         $response = $api->settingGetBanks();
-        if ($response->Success) {
+        $response2 = $api->settingGetCashes();
+        if ($response->Success || $response2->Success) {
             foreach ($response->Result as $bank) {
                 // show only bank with default currency in hesabfa
                 $default_currency = new Currency($settingService->getHesabfaDefaultCurrency());
@@ -92,8 +97,19 @@ class HesabfaSettingsController extends ModuleAdminController
                     if($bank->Branch) $bankName .= ' - ' . $bank->Branch;
                     if($bank->AccountNumber) $bankName .= ' - ' . $bank->AccountNumber;
                     array_push($bank_options, array(
-                        'id' => $bank->Code,
+                        'id' => 'bank'.$bank->Code,
                         'name' => $bankName,
+                    ));
+                }
+            }
+            foreach ($response2->Result as $cash) {
+                // show only cash with default currency in hesabfa
+                $default_currency = new Currency($settingService->getHesabfaDefaultCurrency());
+                if ($cash->Currency == $default_currency->iso_code) {
+                    $cashName = $cash->Name;
+                    array_push($bank_options, array(
+                        'id' => 'cash'.$cash->Code,
+                        'name' => $cashName,
                     ));
                 }
             }
@@ -121,6 +137,9 @@ class HesabfaSettingsController extends ModuleAdminController
         $settingService->setInWhichStatusAddPaymentReceipt($formData["invoiceReceiptStatus"]);
 
         $settingService->setPaymentReceiptDestination($formData["paymentReceiptBankCode"]);
+
+        $settingService->setFreightOption($formData["invoiceFreightStatus"]);
+        $settingService->setFreightValue($formData["freightInputValue"]);
 
         echo true;
         die;

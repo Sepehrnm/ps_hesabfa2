@@ -38,7 +38,7 @@ class InvoiceService
 
         // map Invoice Items
         $hesabfaInvoiceItems = $this->mapInvoiceItems($order, $orderId, $discountAndShipping["order_total_discount"],
-            $discountAndShipping["split"]);
+            $discountAndShipping["split"], $discountAndShipping["shipping"]);
 
         // map Invoice
         $hesabfaInvoice = $this->mapInvoice($order, $orderId, $orderType, $reference, $discountAndShipping["shipping"], $hesabfaInvoiceItems);
@@ -72,7 +72,7 @@ class InvoiceService
         }
     }
 
-    private function mapInvoiceItems(Order $order, $orderId, $order_total_discount, $split)
+    private function mapInvoiceItems(Order $order, $orderId, $order_total_discount, $split, $shipping)
     {
         $products = $order->getProducts();
         $items = array();
@@ -115,6 +115,26 @@ class InvoiceService
                 'Tax' => (float)$this->getOrderPriceInHesabfaDefaultCurrency(($product['unit_price_tax_incl'] - $product['unit_price_tax_excl']), $order),
             );
             array_push($items, $item);
+
+
+            $settingService = new SettingService();
+            $freightOption = $settingService->getFreightOption();
+            if($freightOption === 'newService') {
+                $freightValue = $settingService->getFreightValue();
+
+                $freightItem = array(
+                    'RowNumber' => $i,
+                    'ItemCode' => $freightValue,
+                    'Description' => 'هزینه حمل و نقل',
+                    'Quantity' => 1,
+                    'UnitPrice' => $shipping != null ? $shipping : 0,
+                    'Discount' => 0,
+                    'Tax' => 0
+                );
+                array_push($items, $freightItem);
+
+            }
+
             $i++;
         }
 
@@ -153,18 +173,36 @@ class InvoiceService
         if ($reference === null)
             $reference = $settingService->getWhichNumberSetAsInvoiceReference() ? $order->reference : $orderId;
 
-        return array(
-            'Number' => $psFaService->getInvoiceCodeByPrestaId($orderId),
-            'InvoiceType' => $orderType,
-            'ContactCode' => $psFaService->getCustomerCodeByPrestaId($order->id_customer),
-            'Date' => $date,
-            'DueDate' => $date,
-            'Reference' => $reference,
-            'Status' => 2,
-            'Tag' => json_encode(array('id_order' => $orderId)),
-            'Freight' => $shipping != null ? $shipping : 0,
-            'InvoiceItems' => $invoiceItems,
-        );
+        $freightOption = $settingService->getFreightOption();
+        if($freightOption === 'newService') {
+            $data = array(
+                'Number' => $psFaService->getInvoiceCodeByPrestaId($orderId),
+                'InvoiceType' => $orderType,
+                'ContactCode' => $psFaService->getCustomerCodeByPrestaId($order->id_customer),
+                'Date' => $date,
+                'DueDate' => $date,
+                'Reference' => $reference,
+                'Status' => 2,
+                'Tag' => json_encode(array('id_order' => $orderId)),
+                'InvoiceItems' => $invoiceItems,
+            );
+        } elseif($freightOption === 'newCost') {
+            $data = array(
+                'Number' => $psFaService->getInvoiceCodeByPrestaId($orderId),
+                'InvoiceType' => $orderType,
+                'ContactCode' => $psFaService->getCustomerCodeByPrestaId($order->id_customer),
+                'Date' => $date,
+                'DueDate' => $date,
+                'Reference' => $reference,
+                'Status' => 2,
+                'Freight' => $shipping != null ? $shipping : 0,
+                'Tag' => json_encode(array('id_order' => $orderId)),
+                'InvoiceItems' => $invoiceItems,
+            );
+        }
+
+
+        return $data;
     }
 
     private function saveInvoiceCustomer(Order $order)

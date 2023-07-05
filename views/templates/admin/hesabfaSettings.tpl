@@ -87,6 +87,17 @@
             {/foreach}
         </select>
 
+        <label style="margin-top: 10px">{l s='هزینه حمل و نقل در فاکتور' mod='ps_hesabfa'}</label>&nbsp;
+        <select class="form-control" id="hesabfa-setting-freight-invoice-status" style="max-width: 250px">
+            <option value="-1">انتخاب کنید</option>
+            <option {if $selectedFreightOption eq 'newService'} selected {/if} value="newService">{l s='ذخیره به عنوان یک خدمت جدید' mod='ps_hesabfa'}</option>
+            <option {if $selectedFreightOption eq 'newCost'} selected {/if} value="newCost">{l s='ذخیره به عنوان هزینه' mod='ps_hesabfa'}</option>
+        </select>
+
+        <br>
+        <label class="form-label" for="hesabfa-setting-freight-input-value">کد حمل و نقل ذخیره شده در حسابفا</label>
+        <input style="max-width: 250px" class="form-control" type="text" id="hesabfa-setting-freight-input-value" value="{$selectedFreightValue}" />
+
         {* ================= Receipt settings ================= *}
         <br><br>
         <strong class="text-primary">{l s='Receipt Settings' mod='ps_hesabfa'}</strong>
@@ -134,6 +145,9 @@
                 invoiceReference: $('#hesabfa-setting-invoice-reference').prop('selectedIndex'),
                 invoiceStatus: $('#hesabfa-setting-invoice-status').val(),
                 returnInvoiceStatus: $('#hesabfa-setting-return-invoice-status').val(),
+
+                invoiceFreightStatus: $('#hesabfa-setting-freight-invoice-status').val(),
+                freightInputValue: $('#hesabfa-setting-freight-input-value').val(),
 
                 invoiceReceiptStatus: $('#hesabfa-setting-invoice-receipt-status').val(),
 

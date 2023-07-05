@@ -58,18 +58,12 @@ class HesabfaApiService implements IHesabfaApiService
 
         $data_string = json_encode($data);
 
-        //LogService::writeLogObj($data_string);
-
         if ($this->settingService->getDebugMode()) {
             PrestaShopLogger::addLog('ssbhesabfa - Method:' . $method . ' - DataString: ' . serialize($data_string), 1, null, null, null, true);
-//            var_dump('ssbhesabfa - Method:' . $method . ' - DataString: ' .$data_string);
+
         }
 
         $url = 'https://api.hesabfa.com/v1/' . $method;
-
-        $apiAddress = $this->settingService->getApiAddress();
-        if($apiAddress == 2)
-            $url = 'http://api.hesabfa.ir/v1/' . $method;
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -354,15 +348,23 @@ class HesabfaApiService implements IHesabfaApiService
 
     public function invoiceSavePayment($number, $bankCode, $date, $amount, $transactionNumber = null, $description = null)
     {
+        global $paymentCode;
         $method = 'invoice/savepayment';
         $data = array(
             'number' => (int)$number,
-            'bankCode' => (int)$bankCode,
             'date' => $date,
             'amount' => $amount,
             'transactionNumber' => $transactionNumber,
             'description' => $description,
         );
+
+        if(substr($bankCode, 0, 4) === 'cash') {
+            $paymentCode = array('cashCode' => (int)substr($bankCode, 4));
+        } elseif(substr($bankCode, 0, 4) === 'bank') {
+            $paymentCode = array('bankCode' => (int)substr($bankCode, 4));
+        }
+
+        $data = array_merge($data, $paymentCode);
 
         return $this->apiRequest($method, $data);
     }
@@ -434,6 +436,13 @@ class HesabfaApiService implements IHesabfaApiService
     public function settingGetBanks()
     {
         $method = 'setting/getBanks';
+
+        return $this->apiRequest($method);
+    }
+
+    public function settingGetCashes()
+    {
+        $method = 'setting/getCashes';
 
         return $this->apiRequest($method);
     }

@@ -59,7 +59,7 @@
 	<h3><i class="icon icon-tags"></i> {l s='Documentation' mod='ps_hesabfa'}</h3>
 		<ul>
 			<li><a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank">{l s='Hesabfa Module Help' mod='ps_hesabfa'}</a></li>
-			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.27)</a></li>
+			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.28)</a></li>
 		</ul>
 </div>
 
@@ -84,18 +84,15 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.27)</h4>
+				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.28)</h4>
 			</div>
 			<div class="modal-body">
 				<ul>
-					<li>باز کردن کالاهای پک (بسته محصولات) در هنگام ثبت فاکتور در حسابفا</li>
-					<li>امکان صدور رسید فاکتورها به حسابفا بصورت گروهی در صفحه ورود و خروج</li>
-					<li>تغییر تنظیمات رسید: از این نسخه به بعد رسید فاکتورها فقط در یک بانک قابل ثبت است که باید در تنظیمات انتخاب گردد.</li>
-					<li>رفع باگ ثبت آدرس مشتریان در هنگام صدور گروهی مشتریان به حسابفا</li>
-					<li>رفع باگ فاکتورهای تخفیف دار</li>
-					<li>رفع مشکل ثبت مجدد رسید فاکتورها</li>
-					<li>رفع مشکل timeout شدن صدور گروهی کالاها در فروشگاه های با تعداد کالاهای بسیار زیاد</li>
-					<li>رفع باگ بروزرسانی فاکتورهای با بیش از ۱۰ آیتم</li>
+					<li>رفع باگ تاریخ انقضا</li>
+					<li>حذف روش های آدرس API</li>
+					<li>اضافه شدن صندوق به پرداخت ها</li>
+					<li>رفع باگ شماره تراکنش</li>
+					<li>امکان ثبت حمل و نقل فاکتور به صورت یک خدمت مجزا</li>
 				</ul>
 			</div>
 			<div class="modal-footer">

@@ -256,7 +256,7 @@ class ProductService
 
         $result = array();
         $result["error"] = false;
-        $rpp = 500;
+        $rpp = 200;
 
         if ($batch == 1) {
             $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product`';
