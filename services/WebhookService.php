@@ -281,10 +281,12 @@ class WebhookService
             if ($settingService->getUpdateQuantityFromHesabfaToStore()) {
                 if ($id_attribute != 0) {
                     $current_quantity = StockAvailable::getQuantityAvailableByProduct($id_product, $id_attribute);
-                    $diff = $itemQuantity - $current_quantity;
+//                    $diff = $itemQuantity - $current_quantity;
+                    $diff = $item->Stock - $current_quantity;
+
                     if ($diff != 0) {
-                        StockAvailable::setQuantity($id_product, $id_attribute, $itemQuantity);
-//                        StockAvailable::updateQuantity($id_product, $id_attribute, $item->Stock);
+//                        StockAvailable::updateQuantity($id_product, $id_attribute, $itemQuantity);
+                        StockAvailable::updateQuantity($id_product, $id_attribute, $item->Stock);
 
                         //TODO: Check why this object not update the quantity
 //                        $combination = new Combination($id_attribute);
@@ -292,30 +294,31 @@ class WebhookService
 //                        $combination->update();
 
                         $sql = 'UPDATE `' . _DB_PREFIX_ . 'product_attribute`
-                                SET `quantity` = '. $itemQuantity . '
+                                SET `quantity` = '. $item->Stock . '
                                 WHERE `id_product` = ' . $id_product . ' AND `id_product_attribute` = ' . $id_attribute;
                         Db::getInstance()->execute($sql);
 
-                        $msg = "Item $id_product-$id_attribute quantity changed. Old qty: $current_quantity. New qty: $itemQuantity, Product id: $id_product";
+                        $msg = "Item $id_product-$id_attribute quantity changed. Old qty: $current_quantity. New qty: $item->Stock, Product id: $id_product";
                         LogService::writeLogStr($msg);
                     }
                 } else {
                     $current_quantity = StockAvailable::getQuantityAvailableByProduct($id_product);
-                    $diff = $itemQuantity - $current_quantity;
+//                    $diff = $itemQuantity - $current_quantity;
+                    $diff = $item->Stock - $current_quantity;
                     if ($diff != 0) {
-                        StockAvailable::setQuantity($id_product, null, $itemQuantity);
-//                        StockAvailable::updateQuantity($id_product, null, $item->Stock);
+//                        StockAvailable::updateQuantity($id_product, null, $itemQuantity);
+                        StockAvailable::updateQuantity($id_product, null, $item->Stock);
 
                         //TODO: Check why this object not update the quantity
 //                    $product->quantity = $item->Stock;
 //                    $product->update();
 
                         $sql = 'UPDATE `' . _DB_PREFIX_ . 'product`
-                                SET `quantity` = '. $itemQuantity . '
+                                SET `quantity` = '. $item->Stock . '
                                 WHERE `id_product` = ' . $id_product;
                         Db::getInstance()->execute($sql);
 
-                        $msg = "Item $id_product quantity changed. Old qty: $current_quantity. New qty: $itemQuantity, Product id: $id_product";
+                        $msg = "Item $id_product quantity changed. Old qty: $current_quantity. New qty: $item->Stock, Product id: $id_product";
                         LogService::writeLogStr($msg);
                     }
                 }
