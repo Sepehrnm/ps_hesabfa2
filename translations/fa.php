@@ -15,8 +15,6 @@ $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_52eb29f924066488e71300395b784ad5'] 
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_d876ff8da67c3731ae25d8335a4168b4'] = 'کلید API';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_fb38433bd05a0e34a305e27d2f1706f8'] = 'توکن API حسابفا را وارد کنید';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_5161b4f9ce9a8b7d966e8bf3c049f6f3'] = 'توکن API';
-$_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_43c22a7cd7ec7d02ce50d019f7c531fc'] = 'یکی از آدرس های رابط برنامه نویسی حسابفا را انتخاب کنید';
-$_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_4f04a421d2249c484621e94ec867ea7e'] = 'آدرس رابط برنامه نویسی';
 $_MODULE['<{ps_hesabfa}prestashop>ps_hesabfa_c9cc8cce247e49bae79f15173ce97354'] = 'ذخیره';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettingscontroller_cb7d4cc6fcbd6660886ad65206b59215'] = 'ذخیره در تمام وضعیت ها';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettingscontroller_225dcbfbd01e60b2dd39ba1a7044ee9b'] = 'انتخاب نشده';
@@ -67,6 +65,10 @@ $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_d79cf3f429596f77db95c65074663a
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_1e860e56970a81a1ba3e1fcb7fccc846'] = 'شماره ارجاع سفارش';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ec49d6b8df16d63d7cd1dd1bdc0dffda'] = 'در کدام وضعیت فاکتور در حسابفا ثبت شود';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_a7edb345c0f3e4ff08f197e2fe040bb2'] = 'در کدام وضعیت فاکتور برگشت از فروش در حسابفا ثبت شود';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_0758af77b25f82724ca5432c484e5aa0'] = 'هزینه حمل و نقل در فاکتور';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ddb4c18eb2b7ae47056f020a0475caa1'] = 'ذخیره به عنوان یک خدمت جدید';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_a80cfef470d527dad6b4bf07fe433093'] = 'ذخیره به عنوان هزینه';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ab397c7903fe48be8a25761b8ab9fd76'] = 'کد حمل و نقل ذخیره شده در حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_78d88c630d63055c91335d256fabba50'] = 'تنظیمات رسید';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_5b4f1b32173234d86977703239e2c2ec'] = 'در کدام وضعیت رسید فاکتور در حسابفا ثبت شود';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_f244b59e50a914ece511772186ed6f92'] = 'در کدام بانک رسید فاکتور در حسابفا ثبت شود';
