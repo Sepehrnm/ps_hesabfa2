@@ -33,6 +33,11 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('selectedFreightOption', $settingService->getFreightOption());
         $this->context->smarty->assign('selectedFreightValue', $settingService->getFreightValue());
 
+        $this->context->smarty->assign('selectedCardTransferOption', $settingService->getCardTransferValue());
+        $this->context->smarty->assign('selectedChequeTransferOption', $settingService->getChequeTransferValue());
+        $this->context->smarty->assign('selectedDepositTransferOption', $settingService->getDepositTransferValue());
+        $this->context->smarty->assign('selectedOtherTransferOption', $settingService->getOtherTransferValue());
+
 //        LogService::writeLogStr($settingService->getUpdatePriceFromHesabfaToStore());
 
         $orderStatusOptions = array();
@@ -140,6 +145,12 @@ class HesabfaSettingsController extends ModuleAdminController
 
         $settingService->setFreightOption($formData["invoiceFreightStatus"]);
         $settingService->setFreightValue($formData["freightInputValue"]);
+
+
+        $settingService->setCardTransferValue($formData["cardTransferOption"]);
+        $settingService->setChequeTransferValue($formData["chequeTransferOption"]);
+        $settingService->setDepositTransferValue($formData["depositTransferOption"]);
+        $settingService->setOtherTransferValue($formData["otherTransferOption"]);
 
         echo true;
         die;

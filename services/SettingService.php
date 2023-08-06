@@ -224,6 +224,49 @@ class SettingService implements ISettingService
         return $this->getSetting("FREIGHT_INVOICE_VALUE");
     }
 
+    //new feature
+    public function setCardTransferValue($cardTransferOption)
+    {
+        $this->setSetting("CARD_TRANSFER_VALUE", $cardTransferOption);
+    }
+
+    public function setDepositTransferValue($depositTransferOption)
+    {
+        $this->setSetting("DEPOSIT_TRANSFER_VALUE", $depositTransferOption);
+    }
+
+    public function setChequeTransferValue($chequeTransferOption)
+    {
+        $this->setSetting("CHEQUE_TRANSFER_VALUE", $chequeTransferOption);
+    }
+
+    public function setOtherTransferValue($otherTransferOption)
+    {
+        $this->setSetting("OTHER_TRANSFER_VALUE", $otherTransferOption);
+    }
+
+    public function getCardTransferValue()
+    {
+        return $this->getSetting("CARD_TRANSFER_VALUE");
+    }
+
+    public function getDepositTransferValue()
+    {
+        return $this->getSetting("DEPOSIT_TRANSFER_VALUE");
+    }
+
+    public function getChequeTransferValue()
+    {
+        return $this->getSetting("CHEQUE_TRANSFER_VALUE");
+    }
+
+    public function getOtherTransferValue()
+    {
+        return $this->getSetting("OTHER_TRANSFER_VALUE");
+    }
+
+    ////////////////////////////////////////////////////////////
+
     public function setLastChangesLogId($value)
     {
         $this->setSetting("LAST_CHANGE_LOG_ID", $value);

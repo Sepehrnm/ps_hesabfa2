@@ -131,7 +131,10 @@ class InvoiceService
                     'Discount' => 0,
                     'Tax' => 0
                 );
-                array_push($items, $freightItem);
+
+                if($shipping != 0) {
+                    array_push($items, $freightItem);
+                }
 
             }
 

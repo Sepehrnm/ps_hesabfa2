@@ -2,9 +2,9 @@
 <module>
     <name>ps_hesabfa</name>
     <displayName><![CDATA[حسابفا]]></displayName>
-    <version><![CDATA[2.0.28]]></version>
+    <version><![CDATA[2.0.30]]></version>
     <description><![CDATA[نرم افزار حسابداری آنلاین حسابفا]]></description>
-    <author><![CDATA[Hesabfa]]></author>
+    <author><![CDATA[Sepehr Najafi]]></author>
     <tab><![CDATA[administration]]></tab>
 	<confirmUninstall><![CDATA[آیا از حذف ماژول حسابفا مطمئن هستید؟ دقت کنید که با حذف ماژول جدول ارتباطات بین ماژول و حسابفا نیز حذف خواهد شد و تمامی ارتباطات از بین می رود.]]></confirmUninstall>
     <is_configurable>1</is_configurable>

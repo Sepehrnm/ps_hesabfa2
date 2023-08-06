@@ -1,6 +1,23 @@
 <style>
+	@import url('https://v1.fontapi.ir/css/Yekan');
+	.panel, select {
+		font-family: "Yekan", Tahoma, sans-serif !important;
+	}
+
 	.hesabfa-menu {
 		width: 120px;
+	}
+
+	.panel a {
+		height: 80px;
+	}
+
+	#business-info {
+		font-size: 0.8rem;
+	}
+
+	#business-info strong {
+		font-size: 1rem;
 	}
 </style>
 {if $needUpdate eq true}
@@ -19,7 +36,7 @@
 
 <div class="panel">
 	<h3><i class="icon icon-credit-card"></i> {l s='Hesabfa Online Accounting Software module!' mod='ps_hesabfa'}</h3>
-	<p>
+	<p style="font-family: Tahoma, sans-serif;font-size: 1rem;">
 		{l s='This module helps connect your (online) store to Hesabfa online accounting software. By using this module, saving products, contacts, and orders in your store will also save them automatically in your Hesabfa account. Besides that, just after a client pays a bill, the receipt document will be stored in Hesabfa as well. Of course, you have to register your account in Hesabfa first. To do so, visit Hesabfa at the link here www.hesabfa.com and sign up for free. After you signed up and entered your account, choose your business, then in the settings menu/API, you can find the API keys for the business and import them to the plugin’s settings. Now your module is ready to use.' mod='ps_hesabfa'}<br />
 	</p>
 
@@ -57,14 +74,14 @@
 
 <div class="panel">
 	<h3><i class="icon icon-tags"></i> {l s='Documentation' mod='ps_hesabfa'}</h3>
-		<ul>
+		<ul style="font-size: 0.8rem;">
 			<li><a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank">{l s='Hesabfa Module Help' mod='ps_hesabfa'}</a></li>
-			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.28)</a></li>
+			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.30)</a></li>
 		</ul>
 </div>
 
 {if $showBusinessInfo eq true}
-	<div class="panel hesabfa-f">
+	<div class="panel hesabfa-f" id="business-info">
 		<h3><i class="icon icon-tags"></i> {l s='Business Information' mod='ps_hesabfa'}</h3>
 		{l s='Business Name' mod='ps_hesabfa'}: <strong>{$businessName}</strong><br>
 		{l s='Subscription Plan' mod='ps_hesabfa'}: <strong>{$subscription}</strong><br>
@@ -84,15 +101,13 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.28)</h4>
+				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.30)</h4>
 			</div>
 			<div class="modal-body">
-				<ul>
-					<li>رفع باگ تاریخ انقضا</li>
-					<li>حذف روش های آدرس API</li>
-					<li>اضافه شدن صندوق به پرداخت ها</li>
-					<li>رفع باگ شماره تراکنش</li>
-					<li>امکان ثبت حمل و نقل فاکتور به صورت یک خدمت مجزا</li>
+				<ul style="font-size: 0.9rem;">
+					<li>اضافه شدن روش های پرداخت در تب تنظیمات افزونه</li>
+					<li>رفع باگ موجودی</li>
+					<li>تغییر فونت ماژول</li>
 				</ul>
 			</div>
 			<div class="modal-footer">

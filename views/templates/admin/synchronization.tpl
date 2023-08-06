@@ -1,3 +1,9 @@
+<style>
+    @import url('https://v1.fontapi.ir/css/Yekan');
+    .panel, select {
+        font-family: "Yekan", Tahoma, sans-serif !important;
+    }
+</style>
 <div class="panel">
     <div class="panel-heading">
         {l s='Sync Products Quantity and Price' mod='ps_hesabfa'}

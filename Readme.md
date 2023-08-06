@@ -48,3 +48,11 @@ For more information and a full guide to how to use Hesabfa and WooCommerce Plug
 * Sync quantity bug fixed
 * Comments Refactored
 * Codes Refactored
+
+= 2.0.30 - 00.00.2023 =
+* Different payment methods option added
+* Inventory bug fixed
+* Font family and size changed
+* Codes Refactored
+* Requests amount per batch decreased
+* Item name limit increased

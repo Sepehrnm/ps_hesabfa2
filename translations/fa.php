@@ -69,6 +69,12 @@ $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_0758af77b25f82724ca5432c484e5a
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ddb4c18eb2b7ae47056f020a0475caa1'] = 'ذخیره به عنوان یک خدمت جدید';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_a80cfef470d527dad6b4bf07fe433093'] = 'ذخیره به عنوان هزینه';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ab397c7903fe48be8a25761b8ab9fd76'] = 'کد حمل و نقل ذخیره شده در حسابفا';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_2b1d04012eebdc1741b53b624d369151'] = 'روش های پرداخت';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_f7565c9f89036354c8b7a7cc420a46ea'] = 'در اینجا انتخاب کنید که هر روش پرداخت در کدام بانک یا صندوق ذخیره شود';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_3ed81ef3ac8e30d23c107f3663f42c50'] = 'کارت به کارت بانکی';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_a1780854234c7597dfa984c91fe5dc89'] = 'واریز به فیش بانکی';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_e9047dd036624b37e73bbb377f7a9d75'] = 'پرداخت با چک';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_6f8ff92ef2b4030d60b535dca88d15a3'] = 'سایر روش های پرداخت';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_78d88c630d63055c91335d256fabba50'] = 'تنظیمات رسید';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_5b4f1b32173234d86977703239e2c2ec'] = 'در کدام وضعیت رسید فاکتور در حسابفا ثبت شود';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_f244b59e50a914ece511772186ed6f92'] = 'در کدام بانک رسید فاکتور در حسابفا ثبت شود';

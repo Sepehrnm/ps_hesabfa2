@@ -35,7 +35,26 @@ class ReceiptService
         foreach ($payments as $payment) {
             if ($payment->amount <= 0) return true;
 
-            $bank_code = $this->getBankCode();
+            global $bank_code;
+
+//            $bank_code = $this->getBankCode();
+            //new feature
+            $settingService = new SettingService();
+            $cardBank = $settingService->getCardTransferValue();
+            $chequeBank = $settingService->getChequeTransferValue();
+            $depositBank = $settingService->getDepositTransferValue();
+            $otherwaysBank = $settingService->getOtherTransferValue();
+
+
+            $paymentGateway = $order->module;
+
+            switch($paymentGateway) {
+                case "ps_bankwire":     $bank_code = $cardBank;break;
+                case "ps_wirepayment":  $bank_code = $depositBank;break;
+                case "ps_checkpayment": $bank_code = $chequeBank;break;
+
+                default: $bank_code = $otherwaysBank;
+            }
 
             if ($bank_code == -1)
                 return true;

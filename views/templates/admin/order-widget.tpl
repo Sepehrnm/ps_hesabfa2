@@ -1,3 +1,9 @@
+<style>
+    @import url('https://v1.fontapi.ir/css/Yekan');
+    .panel, select {
+        font-family: "Yekan", Tahoma, sans-serif !important;
+    }
+</style>
 <div class="card-header">
     <h3 class="card-header-title">{l s='Hesabfa' mod='ps_hesabfa'}</h3>
 </div>

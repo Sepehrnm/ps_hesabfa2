@@ -1,3 +1,9 @@
+<style>
+    @import url('https://v1.fontapi.ir/css/Yekan');
+    .panel, select {
+        font-family: "Yekan", Tahoma, sans-serif !important;
+    }
+</style>
 <div class="panel">
     <div class="panel-heading">
         {l s='Hesabfa Plugin Settings' mod='ps_hesabfa'}
@@ -12,7 +18,7 @@
 
         <label>{l s='Barcode' mod='ps_hesabfa'}</label>&nbsp;
         <small>({l s='Which code use as Barcode in Hesabfa' mod='ps_hesabfa'})</small>
-        <select class="form-control" style="max-width: 250px" id="hesabfa-settings-barcode">
+        <select class="form-control" style="max-width: 250px;font-size: 1rem;" id="hesabfa-settings-barcode">
             <option {if $selectedBarcode eq 0} selected {/if}>Reference</option>
             <option {if $selectedBarcode eq 1} selected {/if}>UPC barcode</option>
             <option {if $selectedBarcode eq 2} selected {/if}>EAN-13 or JAN barcode</option>
@@ -98,6 +104,48 @@
         <label class="form-label" for="hesabfa-setting-freight-input-value">{l s='freight field code' mod='ps_hesabfa'}</label>
         <input style="max-width: 250px" class="form-control" type="text" id="hesabfa-setting-freight-input-value" value="{$selectedFreightValue}" />
 
+        {* ================= Payment methods settings ================= *}
+
+        <br><br>
+        <strong class="text-primary">{l s='Payment methods Settings' mod='ps_hesabfa'}</strong>
+        <hr>
+        <small>{l s='Choose payment methods for each payment gateway' mod='ps_hesabfa'}</small>
+        <br><br>
+        <label>{l s='Card Transfer' mod='ps_hesabfa'}</label>&nbsp;
+        <select class="form-control" style="max-width: 250px" id="hesabfa-setting-card-transfer-option">
+            {foreach from=$banks item=b}
+                <option {if $selectedCardTransferOption eq $b.id} selected {/if}
+                        value="{$b.id}">{$b.name}</option>
+            {/foreach}
+        </select>
+
+        <br><br>
+        <label>{l s='Deposit to bank receipt' mod='ps_hesabfa'}</label>&nbsp;
+        <select class="form-control" style="max-width: 250px" id="hesabfa-setting-deposit-transfer-option">
+            {foreach from=$banks item=b}
+                <option {if $selectedDepositTransferOption eq $b.id} selected {/if}
+                        value="{$b.id}">{$b.name}</option>
+            {/foreach}
+        </select>
+
+        <br><br>
+        <label>{l s='Cheque Transfer' mod='ps_hesabfa'}</label>&nbsp;
+        <select class="form-control" style="max-width: 250px" id="hesabfa-setting-cheque-transfer-option">
+            {foreach from=$banks item=b}
+                <option {if $selectedChequeTransferOption eq $b.id} selected {/if}
+                        value="{$b.id}">{$b.name}</option>
+            {/foreach}
+        </select>
+
+        <br><br>
+        <label>{l s='Other Payment Gateways' mod='ps_hesabfa'}</label>&nbsp;
+        <select class="form-control" style="max-width: 250px" id="hesabfa-setting-others-transfer-option">
+            {foreach from=$banks item=b}
+                <option {if $selectedOtherTransferOption eq $b.id} selected {/if}
+                        value="{$b.id}">{$b.name}</option>
+            {/foreach}
+        </select>
+
         {* ================= Receipt settings ================= *}
         <br><br>
         <strong class="text-primary">{l s='Receipt Settings' mod='ps_hesabfa'}</strong>
@@ -110,15 +158,17 @@
             {/foreach}
         </select>
 
-        <p style="margin-top: 15px;">
-            {l s='In which bank register payment receipt' mod='ps_hesabfa'}
-        </p>
-        <select class="form-control payment-method" id="receipt-bank" style="max-width: 250px">
-            {foreach from=$banks item=b}
-                <option {if $selectedBankId eq $b.id} selected {/if}
-                        value="{$b.id}">{$b.name}</option>
-            {/foreach}
-        </select>
+{*        <strong>*}
+{*            <p style="margin-top: 15px;">*}
+{*                {l s='In which bank register payment receipt' mod='ps_hesabfa'}*}
+{*            </p>*}
+{*        </strong>*}
+{*        <select class="form-control payment-method" id="receipt-bank" style="max-width: 250px">*}
+{*            {foreach from=$banks item=b}*}
+{*                <option {if $selectedBankId eq $b.id} selected {/if}*}
+{*                        value="{$b.id}">{$b.name}</option>*}
+{*            {/foreach}*}
+{*        </select>*}
 
     </div>
 
@@ -151,7 +201,13 @@
 
                 invoiceReceiptStatus: $('#hesabfa-setting-invoice-receipt-status').val(),
 
-                paymentReceiptBankCode: $('#receipt-bank').val()
+                paymentReceiptBankCode: $('#receipt-bank').val(),
+
+                //new feature
+                cardTransferOption: $('#hesabfa-setting-card-transfer-option').val(),
+                depositTransferOption: $('#hesabfa-setting-deposit-transfer-option').val(),
+                chequeTransferOption: $('#hesabfa-setting-cheque-transfer-option').val(),
+                otherTransferOption: $('#hesabfa-setting-others-transfer-option').val(),
             }
 
             const data = {

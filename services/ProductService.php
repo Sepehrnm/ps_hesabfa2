@@ -69,7 +69,7 @@ class ProductService
 
         $hesabfaItem = array(
             'Code' => $code,
-            'Name' => mb_substr($product->name[$this->idLang], 0, 99),
+            'Name' => mb_substr($product->name[$this->idLang], 0, 149),
             'PurchasesTitle' => mb_substr($product->name[$this->idLang], 0, 99),
             'SalesTitle' => mb_substr($product->name[$this->idLang], 0, 99),
             'ItemType' => ($product->is_virtual == 1 ? 1 : 0),
@@ -256,7 +256,7 @@ class ProductService
 
         $result = array();
         $result["error"] = false;
-        $rpp = 50;
+        $rpp = 150;
 
         if ($batch == 1) {
             $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product`';
@@ -326,7 +326,7 @@ class ProductService
 
         $result = array();
         $result["error"] = false;
-        $rpp = 100;
+        $rpp = 150;
 
         if ($batch == 1) {
             $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product`';
