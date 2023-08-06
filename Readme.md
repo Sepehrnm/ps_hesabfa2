@@ -10,7 +10,7 @@ Tested up to: 6.2.2
 
 Requires PHP: 7.4
 
-Stable tag: 2.0.28
+Stable tag: 2.0.30
 
 License: http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 
