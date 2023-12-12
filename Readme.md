@@ -6,8 +6,6 @@ Tags: accounting cloud hesabfa
 
 Requires at least: 5.2
 
-Tested up to: 6.2.2
-
 Requires PHP: 7.4
 
 Stable tag: 2.0.30
@@ -49,7 +47,7 @@ For more information and a full guide to how to use Hesabfa and WooCommerce Plug
 * Comments Refactored
 * Codes Refactored
 
-= 2.0.30 - 00.00.2023 =
+= 2.0.30 - 05.08.2023 =
 * Different payment methods option added
 * Inventory bug fixed
 * Font family and size changed

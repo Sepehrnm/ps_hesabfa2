@@ -397,47 +397,52 @@ class ProductService
     }
 
     public function syncProductsPriceAndQuantity($batch, $totalBatch, $total) {
-        $result = array();
-        $result["error"] = false;
+        try {
+            $result = array();
+            $result["error"] = false;
 
-        $hesabfa = new HesabfaApiService(new SettingService());
-        $filters = array(array("Property" => "ItemType", "Operator" => "=", "Value" => 0));
-        $rpp = 500;
+            $hesabfa = new HesabfaApiService(new SettingService());
+            $filters = array(array("Property" => "ItemType", "Operator" => "=", "Value" => 0));
+            $rpp = 500;
 
-        if ($batch == 1) {
-            $total = 0;
-            $response = $hesabfa->itemGetItems(array('Take' => 1, 'Filters' => $filters));
+            if ($batch == 1) {
+                $total = 0;
+                $response = $hesabfa->itemGetItems(array('Take' => 1, 'Filters' => $filters));
+                if ($response->Success) {
+                    $total = $response->Result->FilteredCount;
+                    $totalBatch = ceil($total / $rpp);
+                } else {
+                    $result["error"] = true;
+                    $result["errorMessage"] = "Error while trying to get products for sync. Error Message: $response->ErrorMessage. Error Code: $response->ErrorCode.";
+                    LogService::writeLogStr($result["errorMessage"]);
+                    return $result;
+                };
+            }
+            LogService::writeLogStr("===== Sync products price and quantity from hesabfa to store: part $batch of $totalBatch =====");
+
+            $offset = ($batch - 1) * $rpp;
+            $response = $hesabfa->itemGetItems(array('Skip' => $offset, 'Take' => $rpp, 'SortBy' => 'Id', 'Filters' => $filters));
             if ($response->Success) {
-                $total = $response->Result->FilteredCount;
-                $totalBatch = ceil($total / $rpp);
+                $products = $response->Result->List;
+                foreach ($products as $product) {
+                    WebhookService::setItemChanges($product);
+                }
+                sleep(1);
             } else {
                 $result["error"] = true;
                 $result["errorMessage"] = "Error while trying to get products for sync. Error Message: $response->ErrorMessage. Error Code: $response->ErrorCode.";
                 LogService::writeLogStr($result["errorMessage"]);
                 return $result;
-            };
-        }
-        LogService::writeLogStr("===== Sync products price and quantity from hesabfa to store: part $batch of $totalBatch =====");
-
-        $offset = ($batch - 1) * $rpp;
-        $response = $hesabfa->itemGetItems(array('Skip' => $offset, 'Take' => $rpp, 'SortBy' => 'Id', 'Filters' => $filters));
-        if ($response->Success) {
-            $products = $response->Result->List;
-            foreach ($products as $product) {
-                WebhookService::setItemChanges($product);
             }
-            sleep(1);
-        } else {
-            $result["error"] = true;
-            $result["errorMessage"] = "Error while trying to get products for sync. Error Message: $response->ErrorMessage. Error Code: $response->ErrorCode.";
-            LogService::writeLogStr($result["errorMessage"]);
-            return $result;
-        }
 
-        $result["batch"] = $batch;
-        $result["totalBatch"] = $totalBatch;
-        $result["total"] = $total;
-        return $result;
+            $result["batch"] = $batch;
+            $result["totalBatch"] = $totalBatch;
+            $result["total"] = $total;
+            return $result;
+
+        } catch (Error $error) {
+            LogService::writeLogStr("Error in Sync Products" . $error->getMessage());
+        }
     }
 
 }
