@@ -277,12 +277,14 @@ class ProductService
             if(Pack::isPack($id_product))
                 continue;
 
-                // Set base product
+            // Set base product
             $id_obj = $psFaService->getPsFaId('product', $id_product, 0);
             if (!$id_obj) {
                 $hesabfaItem = $this->mapProduct($product, $id_product);
-                array_push($items, $hesabfaItem);
-                $updateCount++;
+                if (isset($hesabfaItem["Name"]) && !empty($hesabfaItem["Name"])) {
+                    array_push($items, $hesabfaItem);
+                    $updateCount++;
+                }
             }
 
             // Set variations
@@ -292,8 +294,10 @@ class ProductService
                     $id_obj = $psFaService->getPsFaId('product', $id_product, $variation['id_product_attribute']);
                     if (!$id_obj) {
                         $hesabfaItem = $this->mapProductCombination($product, $variation, $id_product);
-                        array_push($items, $hesabfaItem);
-                        $updateCount++;
+                        if (isset($hesabfaItem["Name"]) && !empty($hesabfaItem["Name"])) {
+                            array_push($items, $hesabfaItem);
+                            $updateCount++;
+                        }
                     }
                 }
             }

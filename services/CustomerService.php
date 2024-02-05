@@ -183,8 +183,14 @@ class CustomerService
                 $addressId = $addresses && count($addresses) > 0 ? $addresses[0]["id_address"] : 0;
 
                 $hesabfaContact = $this->mapCustomer($customer, $id_customer, true, $addressId);
-                array_push($contacts, $hesabfaContact);
-                $updateCount++;
+                if (isset($hesabfaContact["Name"]) && !empty($hesabfaContact["Name"])) {
+                    if($hesabfaContact["Mobile"] < 16 && $hesabfaContact["Phone"] < 16) {
+                        array_push($contacts, $hesabfaContact);
+                        $updateCount++;
+                    } else {
+                        LogService::writeLogStr("Number must be under 15 characters. Contact Name: " . $hesabfaContact["Name"]);
+                    }
+                }
             }
         }
 
