@@ -42,6 +42,14 @@ interface ISettingService
 
     public function getPaymentReceiptDestination();
 
+    public function setInvoiceProject($projectTitle);
+
+    public function getInvoiceProject();
+
+    public function setInvoiceSalesman($salesmanName);
+
+    public function getInvoiceSalesman();
+
     public function setLastChangesLogId($value);
 
     public function getLastChangesLogId();
@@ -202,6 +210,26 @@ class SettingService implements ISettingService
     public function getPaymentReceiptDestination()
     {
         return $this->getSetting("PAYMENT_RECEIPT_DESTINATION");
+    }
+
+    public function setInvoiceProject($projectTitle)
+    {
+        $this->setSetting("INVOICE_PROJECT", $projectTitle);
+    }
+
+    public function getInvoiceProject()
+    {
+        return $this->getSetting("INVOICE_PROJECT");
+    }
+
+    public function setInvoiceSalesman($salesmanName)
+    {
+        $this->setSetting("INVOICE_SALESMAN", $salesmanName);
+    }
+
+    public function getInvoiceSalesman()
+    {
+        return $this->getSetting("INVOICE_SALESMAN");
     }
 
     public function setFreightOption($freightOption)

@@ -204,6 +204,10 @@ class InvoiceService
             );
         }
 
+        $salesman = $settingService->getInvoiceSalesman();
+        if(isset($salesman)) $data['SalesmanCode'] = $salesman;
+        $project = $settingService->getInvoiceProject();
+        if(isset($project)) $data['Project'] = $project;
 
         return $data;
     }

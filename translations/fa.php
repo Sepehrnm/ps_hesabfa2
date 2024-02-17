@@ -69,6 +69,8 @@ $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_0758af77b25f82724ca5432c484e5a
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ddb4c18eb2b7ae47056f020a0475caa1'] = 'ذخیره به عنوان یک خدمت جدید';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_a80cfef470d527dad6b4bf07fe433093'] = 'ذخیره به عنوان هزینه';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_ab397c7903fe48be8a25761b8ab9fd76'] = 'کد حمل و نقل ذخیره شده در حسابفا';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_5767c55597ddf18a86f3689abf5cc9a3'] = 'ذخیره پروژه فاکتور';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_62d2dbd1ba41fe0dd83454c99a9561a1'] = 'ذخیره فروشنده فاکتور';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_2b1d04012eebdc1741b53b624d369151'] = 'روش های پرداخت';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_f7565c9f89036354c8b7a7cc420a46ea'] = 'در اینجا انتخاب کنید که هر روش پرداخت در کدام بانک یا صندوق ذخیره شود';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_3ed81ef3ac8e30d23c107f3663f42c50'] = 'کارت به کارت بانکی';

@@ -38,6 +38,9 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('selectedDepositTransferOption', $settingService->getDepositTransferValue());
         $this->context->smarty->assign('selectedOtherTransferOption', $settingService->getOtherTransferValue());
 
+        $this->context->smarty->assign('selectedProjectTitle', $settingService->getInvoiceProject());
+        $this->context->smarty->assign('selectedSalesmanName', $settingService->getInvoiceSalesman());
+
 //        LogService::writeLogStr($settingService->getUpdatePriceFromHesabfaToStore());
 
         $orderStatusOptions = array();
@@ -58,8 +61,12 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('selectedInvoiceReceiptStatus', $settingService->getInWhichStatusAddPaymentReceipt());
 
         $banks = $this->getBanksInHesabfa();
+        $projects = $this->getProjectsInHesabfa();
+        $salesmen = $this->getSalesmenInHesabfa();
 
         $this->context->smarty->assign('banks', $banks);
+        $this->context->smarty->assign('projects', $projects);
+        $this->context->smarty->assign('salesmen', $salesmen);
 
         $selectedBankId = $settingService->getPaymentReceiptDestination();
         $this->context->smarty->assign('selectedBankId', $selectedBankId);
@@ -123,6 +130,50 @@ class HesabfaSettingsController extends ModuleAdminController
         return $bank_options;
     }
 
+    public function getProjectsInHesabfa() {
+        $project_options = array(array(
+            'id' => -1,
+            'title' => $this->l('Not Selected'),
+        ));
+
+        $settingService = new SettingService();
+        $api = new HesabfaApiService($settingService);
+        $response = $api->settingGetProjects();
+        if ($response->Success) {
+            foreach ($response->Result as $project) {
+                $projectTitle = $project->Title;
+                array_push($project_options, array(
+                    'id' => $project->Id,
+                    'title' => $projectTitle,
+                ));
+            }
+        }
+
+        return $project_options;
+    }
+
+    public function getSalesmenInHesabfa() {
+        $salesman_options = array(array(
+            'code' => -1,
+            'name' => $this->l('Not Selected'),
+        ));
+
+        $settingService = new SettingService();
+        $api = new HesabfaApiService($settingService);
+        $response = $api->settingGetSalesmen();
+        if ($response->Success) {
+            foreach ($response->Result as $salesman) {
+                $salesmanName = $salesman->Name;
+                array_push($salesman_options, array(
+                    'code' => $salesman->Code,
+                    'name' => $salesmanName,
+                ));
+            }
+        }
+
+        return $salesman_options;
+    }
+
     public function  ajaxProcessSaveSettings() {
         $formData = Tools::getValue('formData');
 
@@ -146,6 +197,8 @@ class HesabfaSettingsController extends ModuleAdminController
         $settingService->setFreightOption($formData["invoiceFreightStatus"]);
         $settingService->setFreightValue($formData["freightInputValue"]);
 
+        $settingService->setInvoiceProject($formData["projectTitle"]);
+        $settingService->setInvoiceSalesman($formData["salesmanName"]);
 
         $settingService->setCardTransferValue($formData["cardTransferOption"]);
         $settingService->setChequeTransferValue($formData["chequeTransferOption"]);

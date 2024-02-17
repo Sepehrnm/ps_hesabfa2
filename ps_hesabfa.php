@@ -50,7 +50,7 @@ class Ps_hesabfa extends Module
     {
         $this->name = 'ps_hesabfa';
         $this->tab = 'administration';
-        $this->version = '2.0.30';
+        $this->version = '2.0.31';
         $this->author = 'Hesabfa';
         $this->need_instance = 0;
 

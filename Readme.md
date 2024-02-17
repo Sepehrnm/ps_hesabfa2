@@ -8,7 +8,7 @@ Requires at least: 5.2
 
 Requires PHP: 7.4
 
-Stable tag: 2.0.30
+Stable tag: 2.0.31
 
 License: http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 
@@ -54,3 +54,7 @@ For more information and a full guide to how to use Hesabfa and WooCommerce Plug
 * Codes Refactored
 * Requests amount per batch decreased
 * Item name limit increased
+
+= 2.0.31 - 17.02.2024 =
+* Invoice Salesman Added
+* Invoice Project Added

@@ -28,6 +28,8 @@ interface IHesabfaApiService {
 
     public function settingSetChangeHook($url, $hookPassword);
     public function settingGetChanges($start = 0);
+    public function settingGetProjects();
+    public function settingGetSalesmen();
     public function settingGetBanks();
     public function settingGetCurrency();
     public function settingGetFiscalYear();
@@ -431,6 +433,20 @@ class HesabfaApiService implements IHesabfaApiService
         );
 
         return $this->apiRequest($method, $data);
+    }
+
+    public function settingGetProjects()
+    {
+        $method = 'setting/getProjects';
+
+        return $this->apiRequest($method);
+    }
+
+    public function settingGetSalesmen()
+    {
+        $method = 'setting/getSalesmen';
+
+        return $this->apiRequest($method);
     }
 
     public function settingGetBanks()

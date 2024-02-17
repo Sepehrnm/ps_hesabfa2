@@ -76,7 +76,7 @@
 	<h3><i class="icon icon-tags"></i> {l s='Documentation' mod='ps_hesabfa'}</h3>
 		<ul style="font-size: 0.8rem;">
 			<li><a href="https://www.hesabfa.com/help/topics/افزونه/پرستاشاپ" target="_blank">{l s='Hesabfa Module Help' mod='ps_hesabfa'}</a></li>
-			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.30)</a></li>
+			<li><a href="JavaScript:void(0)" onclick="showLastChanges()">{l s='Plugin last changes list' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.31)</a></li>
 		</ul>
 </div>
 
@@ -101,13 +101,12 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.30)</h4>
+				<h4 class="modal-title">{l s='Plugin last changes' mod='ps_hesabfa'} ({l s='Version' mod='ps_hesabfa'} 2.0.31)</h4>
 			</div>
 			<div class="modal-body">
 				<ul style="font-size: 0.9rem;">
-					<li>اضافه شدن روش های پرداخت در تب تنظیمات افزونه</li>
-					<li>رفع باگ موجودی</li>
-					<li>تغییر فونت ماژول</li>
+					<li>اضافه شدن امکان تعیین پروژه برای فاکتور</li>
+					<li>اضافه شدن امکان تعیین فروشنده برای فاکتور</li>
 				</ul>
 			</div>
 			<div class="modal-footer">
@@ -160,8 +159,8 @@
 		});
 
 		let version = localStorage.getItem('hesabfa-plugin-version');
-		if(!version || +version.replaceAll('.', '') < +'2.0.27'.replaceAll('.', '')) {
-			localStorage.setItem('hesabfa-plugin-version', '2.0.27');
+		if(!version || +version.replaceAll('.', '') < +'2.0.31'.replaceAll('.', '')) {
+			localStorage.setItem('hesabfa-plugin-version', '2.0.31');
 			showLastChanges();
 		}
 	});

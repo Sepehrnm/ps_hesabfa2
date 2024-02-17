@@ -104,6 +104,20 @@
         <label class="form-label" for="hesabfa-setting-freight-input-value">{l s='freight field code' mod='ps_hesabfa'}</label>
         <input style="max-width: 250px" class="form-control" type="text" id="hesabfa-setting-freight-input-value" value="{$selectedFreightValue}" />
 
+        <label style="margin-top: 10px">{l s='save invoice project' mod='ps_hesabfa'}</label>&nbsp;
+        <select class="form-control" id="hesabfa-setting-project-invoice" style="max-width: 250px">
+            {foreach from=$projects item=i}
+                <option {if $selectedProjectTitle eq $i.title} selected {/if} value="{$i.title}">{$i.title}</option>
+            {/foreach}
+        </select>
+
+        <label style="margin-top: 10px">{l s='save invoice salesman' mod='ps_hesabfa'}</label>&nbsp;
+        <select class="form-control" id="hesabfa-setting-salesman-invoice" style="max-width: 250px">
+            {foreach from=$salesmen item=i}
+                <option {if $selectedSalesmanName eq $i.code} selected {/if} value="{$i.code}">{$i.name}</option>
+            {/foreach}
+        </select>
+
         {* ================= Payment methods settings ================= *}
 
         <br><br>
@@ -208,6 +222,9 @@
                 depositTransferOption: $('#hesabfa-setting-deposit-transfer-option').val(),
                 chequeTransferOption: $('#hesabfa-setting-cheque-transfer-option').val(),
                 otherTransferOption: $('#hesabfa-setting-others-transfer-option').val(),
+
+                projectTitle: $('#hesabfa-setting-project-invoice').val(),
+                salesmanName: $('#hesabfa-setting-salesman-invoice').val(),
             }
 
             const data = {
