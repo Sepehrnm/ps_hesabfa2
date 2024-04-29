@@ -217,10 +217,8 @@ class WebhookService
         if (!is_object($item))
             return false;
 
-//        LogService::writeLogObj($item);
-
+        global $itemQuantity;
         $itemQuantity = $item->Stock;
-
 
         $settingService = new SettingService();
         $psFaService = new PsFaService();
@@ -286,12 +284,12 @@ class WebhookService
 
                     if ($diff != 0) {
 //                        StockAvailable::updateQuantity($id_product, $id_attribute, $itemQuantity);
-                        StockAvailable::updateQuantity($id_product, $id_attribute, $item->Stock);
+                        StockAvailable::setQuantity($id_product, $id_attribute, $item->Stock);
 
                         //TODO: Check why this object not update the quantity
-//                        $combination = new Combination($id_attribute);
-//                        $combination->quantity = $item->Stock;
-//                        $combination->update();
+                        $combination = new Combination($id_attribute);
+                        $combination->quantity = $item->Stock;
+                        $combination->update();
 
                         $sql = 'UPDATE `' . _DB_PREFIX_ . 'product_attribute`
                                 SET `quantity` = '. $item->Stock . '
@@ -305,24 +303,28 @@ class WebhookService
                     $current_quantity = StockAvailable::getQuantityAvailableByProduct($id_product);
 //                    $diff = $itemQuantity - $current_quantity;
                     $diff = $item->Stock - $current_quantity;
+
                     if ($diff != 0) {
 //                        StockAvailable::updateQuantity($id_product, null, $itemQuantity);
-                        StockAvailable::updateQuantity($id_product, null, $item->Stock);
+                        if($itemQuantity != 0) {
+                            StockAvailable::setQuantity($id_product, null, $itemQuantity);
+                            //TODO: Check why this object not update the quantity
+                            $product = new Product($id_product);
+                            $product->quantity = $item->Stock;
+                            $product->update();
 
-                        //TODO: Check why this object not update the quantity
-//                    $product->quantity = $item->Stock;
-//                    $product->update();
+                            $sql = 'UPDATE `' . _DB_PREFIX_ . 'product`
+                                    SET `quantity` = '. $itemQuantity . '
+                                    WHERE `id_product` = ' . $id_product;
+                            Db::getInstance()->execute($sql);
 
-                        $sql = 'UPDATE `' . _DB_PREFIX_ . 'product`
-                                SET `quantity` = '. $item->Stock . '
-                                WHERE `id_product` = ' . $id_product;
-                        Db::getInstance()->execute($sql);
-
-                        $msg = "Item $id_product quantity changed. Old qty: $current_quantity. New qty: $item->Stock, Product id: $id_product";
-                        LogService::writeLogStr($msg);
+                            $msg = "Item $id_product quantity changed. Old qty: $current_quantity. New qty: $itemQuantity, Product id: $id_product";
+                            LogService::writeLogStr($msg);
+                        }
                     }
                 }
             }
+
             return true;
         }
         return false;

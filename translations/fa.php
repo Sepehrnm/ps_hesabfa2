@@ -80,6 +80,8 @@ $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_6f8ff92ef2b4030d60b535dca88d15
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_78d88c630d63055c91335d256fabba50'] = 'تنظیمات رسید';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_5b4f1b32173234d86977703239e2c2ec'] = 'در کدام وضعیت رسید فاکتور در حسابفا ثبت شود';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_f244b59e50a914ece511772186ed6f92'] = 'در کدام بانک رسید فاکتور در حسابفا ثبت شود';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_c85f6939f643f442ec74f3a5df2b9057'] = 'حذف رسید های پیشین با ذخیره مجدد';
+$_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_8225434ffb36ac413306bba54bbf3550'] = 'با ذخیره مجدد دستی فاکتور، رسید فاکتور ثبت گردد';
 $_MODULE['<{ps_hesabfa}prestashop>hesabfasettings_c9cc8cce247e49bae79f15173ce97354'] = 'ذخیره';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_e9ca51f247c9224b0a4846ac2f90765f'] = 'صدور محصولات به حسابفا';
 $_MODULE['<{ps_hesabfa}prestashop>import_export_b0fd66dfa6ee182b00bfeb43728ed460'] = 'بازگشت به صفحه اصلی';

@@ -263,7 +263,7 @@ class ProductService
             $total = (int)Db::getInstance()->getValue($sql);
             $totalBatch = ceil($total / $rpp);
         }
-        LogService::writeLogStr("===== Export Products: part $batch of $totalBatch =====");
+        LogService::writeLogStr("Export Products: part $batch of $totalBatch");
 
         $offset = ($batch - 1) * $rpp;
         $sql = "SELECT id_product FROM `" . _DB_PREFIX_ . "product` ORDER BY 'id_product' ASC LIMIT $offset,$rpp";
@@ -337,7 +337,7 @@ class ProductService
             $total = (int)Db::getInstance()->getValue($sql);
             $totalBatch = ceil($total / $rpp);
         }
-        LogService::writeLogStr("===== Export Products Opening Quantity: part $batch of $totalBatch =====");
+        LogService::writeLogStr("Export Products Opening Quantity: part $batch of $totalBatch");
 
         $offset = ($batch - 1) * $rpp;
         $sql = "SELECT id_product FROM `" . _DB_PREFIX_ . "product` ORDER BY 'id_product' ASC LIMIT $offset,$rpp";
@@ -422,7 +422,7 @@ class ProductService
                     return $result;
                 };
             }
-            LogService::writeLogStr("===== Sync products price and quantity from hesabfa to store: part $batch of $totalBatch =====");
+            LogService::writeLogStr("Sync products price and quantity from hesabfa to store: part $batch of $totalBatch");
 
             $offset = ($batch - 1) * $rpp;
             $response = $hesabfa->itemGetItems(array('Skip' => $offset, 'Take' => $rpp, 'SortBy' => 'Id', 'Filters' => $filters));

@@ -18,6 +18,9 @@ class ReceiptService
 
     public function saveReceipt($id_order)
     {
+        $settingService = new SettingService();
+        $deleteOldReceipts = $settingService->getDeleteOldReceiptsStatus();
+
         if (!isset($id_order)) return false;
 
         $hesabfaApi = new HesabfaApiService(new SettingService());
@@ -25,7 +28,18 @@ class ReceiptService
         $psFaService = new PsFaService();
         $invoiceNumber = $psFaService->getInvoiceCodeByPrestaId((int)$id_order);
 
-        if ($invoiceNumber && !$this->checkOldReceipts($invoiceNumber)) return false;
+        if(isset($deleteOldReceipts) && $deleteOldReceipts) {
+            if ($invoiceNumber && !$this->checkOldReceipts($invoiceNumber)) return false;
+        } else {
+            $response = $hesabfaApi->invoiceGet($invoiceNumber);
+            if ($response->Success) {
+                if ($response->Result->Paid > 0) {
+                    // payment submitted before
+                    LogService::writeLogStr("Payment Already Submitted");
+                    return;
+                }
+            }
+        }
 
         $payments = OrderPayment::getByOrderId($id_order);
         $order = new Order($id_order);
@@ -38,8 +52,6 @@ class ReceiptService
             global $bank_code;
 
 //            $bank_code = $this->getBankCode();
-            //new feature
-            $settingService = new SettingService();
             $cardBank = $settingService->getCardTransferValue();
             $chequeBank = $settingService->getChequeTransferValue();
             $depositBank = $settingService->getDepositTransferValue();
@@ -47,13 +59,14 @@ class ReceiptService
 
 
             $paymentGateway = $order->module;
+            $bank_code = $otherwaysBank;
 
             switch($paymentGateway) {
                 case "ps_bankwire":     $bank_code = $cardBank;break;
                 case "ps_wirepayment":  $bank_code = $depositBank;break;
                 case "ps_checkpayment": $bank_code = $chequeBank;break;
 
-                default: $bank_code = $otherwaysBank;
+                //default: $bank_code = $otherwaysBank;
             }
 
             if ($bank_code == -1)
@@ -145,7 +158,7 @@ class ReceiptService
             $total = (int)Db::getInstance()->getValue($sql);
             $totalBatch = ceil($total / $rpp);
         }
-        LogService::writeLogStr("===== Export Invoice Receipts: part $batch of $totalBatch =====");
+        LogService::writeLogStr("Export Invoice Receipts: part $batch of $totalBatch");
 
         $offset = ($batch - 1) * $rpp;
         $sql = "SELECT id_order FROM `" . _DB_PREFIX_ . "orders`

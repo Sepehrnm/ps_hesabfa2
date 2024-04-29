@@ -60,6 +60,9 @@ class HesabfaSettingsController extends ModuleAdminController
         $this->context->smarty->assign('selectedReturnInvoiceStatus', $settingService->getInWhichStatusAddReturnInvoiceToHesabfa());
         $this->context->smarty->assign('selectedInvoiceReceiptStatus', $settingService->getInWhichStatusAddPaymentReceipt());
 
+        $this->context->smarty->assign('deleteOldReceipts', $settingService->getDeleteOldReceiptsStatus());
+        $this->context->smarty->assign('saveReceiptBySubmittingInvoiceManually', $settingService->getSaveReceiptBySubmittingInvoiceManuallyStatus());
+
         $banks = $this->getBanksInHesabfa();
         $projects = $this->getProjectsInHesabfa();
         $salesmen = $this->getSalesmenInHesabfa();
@@ -191,6 +194,9 @@ class HesabfaSettingsController extends ModuleAdminController
         $settingService->setInWhichStatusAddReturnInvoiceToHesabfa($formData["returnInvoiceStatus"]);
 
         $settingService->setInWhichStatusAddPaymentReceipt($formData["invoiceReceiptStatus"]);
+
+        $settingService->setDeleteOldReceiptsStatus($formData["deleteOldReceipts"]);
+        $settingService->setSaveReceiptBySubmittingInvoiceManuallyStatus($formData["saveReceiptBySubmittingInvoiceManually"]);
 
         $settingService->setPaymentReceiptDestination($formData["paymentReceiptBankCode"]);
 

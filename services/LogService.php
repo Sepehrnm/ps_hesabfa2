@@ -6,6 +6,12 @@ class LogService
 
     public static function writeLogStr($logStr)
     {
+
+        $dateTime = new DateTime('now', new DateTimeZone(Configuration::get('PS_TIMEZONE')));
+        $date = $dateTime->format('[Y-m-d H:i:s] ');
+
+        $logStr = $date . $logStr;
+
         $file = fopen(self::$fileName, "a");
         fwrite($file, $logStr . "\n");
         fclose($file);
@@ -13,7 +19,11 @@ class LogService
 
     public static function writeLogObj($logObj)
     {
+        $dateTime = new DateTime('now', new DateTimeZone(Configuration::get('PS_TIMEZONE')));
+        $date = $dateTime->format('[Y-m-d H:i:s] ');
+
         ob_start();
+        echo $date;
         var_dump($logObj);
         file_put_contents(self::$fileName, PHP_EOL . ob_get_flush(), FILE_APPEND);
     }

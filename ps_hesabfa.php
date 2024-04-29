@@ -540,7 +540,7 @@ class Ps_hesabfa extends Module
     // Order hooks
     public function hookActionValidateOrder($params)
     {
-        LogService::writeLogStr("====== hookActionValidateOrder ======");
+        LogService::writeLogStr("hookActionValidateOrder");
         $settingService = new SettingService();
         $settingStatus = $settingService->getInWhichStatusAddInvoiceToHesabfa();
 
@@ -555,17 +555,20 @@ class Ps_hesabfa extends Module
 
     public function hookActionPaymentConfirmation($params)
     {
-        LogService::writeLogStr("====== hookActionPaymentConfirmation ======");
+        $settingService = new SettingService();
+
+        LogService::writeLogStr("hookActionPaymentConfirmation");
         $receiptService = new ReceiptService($this);
         $receiptService->saveReceipt($params['id_order']);
     }
 
     public function hookActionOrderStatusPostUpdate($params)
     {
-        LogService::writeLogStr("====== hookActionOrderStatusPostUpdate ======");
+        LogService::writeLogStr("hookActionOrderStatusPostUpdate");
 
         $invoiceService = new InvoiceService($this);
         $settingService = new SettingService();
+
         $settingStatus = $settingService->getInWhichStatusAddInvoiceToHesabfa();
         $settingStatusReceipt = $settingService->getInWhichStatusAddPaymentReceipt();
         $psFaService = new PsFaService();
@@ -595,7 +598,7 @@ class Ps_hesabfa extends Module
 
     public function hookActionOrderEdited($params)
     {
-        LogService::writeLogStr("====== hookActionOrderEdited ======");
+        LogService::writeLogStr("hookActionOrderEdited");
         $this->hookActionValidateOrder($params);
     }
 
@@ -620,7 +623,7 @@ class Ps_hesabfa extends Module
         $diff = $nowDateTime->diff($syncChangesLastDate);
 
         if ($diff->i > 3) {
-            LogService::writeLogStr('===== Sync Changes Automatically =====');
+            LogService::writeLogStr('Sync Changes Automatically');
             $settingService->setLastChangesCheckDate((new DateTime())->format('Y-m-d H:i:s'));
             new WebhookService();
         }

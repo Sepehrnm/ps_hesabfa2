@@ -308,7 +308,7 @@ class InvoiceService
             $total = $this->getTotalOrders($from_date);
             $totalBatch = ceil($total / $rpp);
         }
-        LogService::writeLogStr("===== Export Orders: part $batch of $totalBatch =====");
+        LogService::writeLogStr("Export Orders: part $batch of $totalBatch");
 
         $offset = ($batch - 1) * $rpp;
         $orders = $this->getOrdersId($from_date, $offset, $rpp);

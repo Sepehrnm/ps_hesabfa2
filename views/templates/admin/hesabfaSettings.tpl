@@ -184,6 +184,22 @@
 {*            {/foreach}*}
 {*        </select>*}
 
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" {if $deleteOldReceipts eq true} checked {/if}
+                       id="deleteOldReceipts">
+                {l s='Delete Old Receipts' mod='ps_hesabfa'}
+            </label>
+        </div>
+
+{*        <div class="checkbox">*}
+{*            <label>*}
+{*                <input type="checkbox" {if $saveReceiptBySubmittingInvoiceManually eq true} checked {/if}*}
+{*                       id="saveReceiptBySubmittingInvoiceManually">*}
+{*                {l s='Save Receipt By Submitting Invoice Manually' mod='ps_hesabfa'}*}
+{*            </label>*}
+{*        </div>*}
+
     </div>
 
     <div class="panel-footer">
@@ -214,6 +230,8 @@
                 freightInputValue: $('#hesabfa-setting-freight-input-value').val(),
 
                 invoiceReceiptStatus: $('#hesabfa-setting-invoice-receipt-status').val(),
+                deleteOldReceipts: $('#deleteOldReceipts').is(':checked') ? 1 : 0,
+                saveReceiptBySubmittingInvoiceManually: $('#saveReceiptBySubmittingInvoiceManually').is(':checked') ? 1 : 0,
 
                 paymentReceiptBankCode: $('#receipt-bank').val(),
 

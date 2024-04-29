@@ -58,3 +58,4 @@ For more information and a full guide to how to use Hesabfa and WooCommerce Plug
 = 2.0.31 - 17.02.2024 =
 * Invoice Salesman Added
 * Invoice Project Added
+* Sync Products Bug Fixed

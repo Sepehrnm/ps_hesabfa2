@@ -28,6 +28,14 @@ interface ISettingService
 
     public function setCustomersCategory($value);
 
+    public function setDeleteOldReceiptsStatus($value);
+
+    public function getDeleteOldReceiptsStatus();
+
+    public function setSaveReceiptBySubmittingInvoiceManuallyStatus($value);
+
+    public function getSaveReceiptBySubmittingInvoiceManuallyStatus();
+
     public function getCustomersCategory();
 
     public function setCustomerAddressStatus($status);
@@ -185,6 +193,26 @@ class SettingService implements ISettingService
     public function setCustomersCategory($value)
     {
         $this->setSetting("CUSTOMER_CATEGORY", $value);
+    }
+
+    public function setDeleteOldReceiptsStatus($value)
+    {
+        $this->setSetting("DELETE_OLD_RECEIPTS", $value);
+    }
+
+    public function getDeleteOldReceiptsStatus()
+    {
+        return $this->getSetting("DELETE_OLD_RECEIPTS");
+    }
+
+    public function setSaveReceiptBySubmittingInvoiceManuallyStatus($value)
+    {
+        $this->setSetting("SAVE_RECEIPT_BY_SUBMITTING_INVOICE_MANUALLY", $value);
+    }
+
+    public function getSaveReceiptBySubmittingInvoiceManuallyStatus()
+    {
+        return $this->getSetting("SAVE_RECEIPT_BY_SUBMITTING_INVOICE_MANUALLY");
     }
 
     public function getCustomersCategory()
