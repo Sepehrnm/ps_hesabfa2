@@ -31,7 +31,13 @@ class HesabfaWidgetsController extends ModuleAdminController
         $orderId = Tools::getValue('orderId');
         $invoiceService = new InvoiceService($this->module);
         $result = $invoiceService->saveInvoice($orderId);
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
     public function ajaxProcessSaveInvoiceReceipt()
@@ -39,7 +45,13 @@ class HesabfaWidgetsController extends ModuleAdminController
         $orderId = Tools::getValue('orderId');
         $receiptService = new ReceiptService($this->module);
         $result = $receiptService->saveReceipt($orderId);
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
     public function ajaxProcessClearInvoiceLinkWithHesabfa()
@@ -47,7 +59,13 @@ class HesabfaWidgetsController extends ModuleAdminController
         $orderId = Tools::getValue('orderId');
         $invoiceService = new InvoiceService($this->module);
         $result = $invoiceService->clearLink($orderId);
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
     public function ajaxProcessDeletePluginData()
@@ -67,7 +85,13 @@ class HesabfaWidgetsController extends ModuleAdminController
         include_once(_PS_MODULE_DIR_ . 'ps_hesabfa/sql/uninstall.php');
         LogService::writeLogStr("Database tables deleted.");
 
-        die(Tools::jsonEncode(true));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode(true));
+        } else {
+            //1.7
+            die(Tools::jsonEncode(true));
+        }
     }
 
 }

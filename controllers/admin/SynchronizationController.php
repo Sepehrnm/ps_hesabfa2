@@ -28,8 +28,13 @@ class SynchronizationController extends ModuleAdminController
 
         $productService = new ProductService();
         $result = $productService->syncProductsPriceAndQuantity($batch, $totalBatch, $total);
-
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
 }

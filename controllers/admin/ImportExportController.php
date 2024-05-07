@@ -31,7 +31,13 @@ class ImportExportController extends ModuleAdminController
         $productService = new ProductService();
         $result = $productService->exportProducts($batch, $totalBatch, $total, $updateCount);
 
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
     public function ajaxProcessExportProductsOpeningQuantity() {
@@ -42,7 +48,13 @@ class ImportExportController extends ModuleAdminController
         $productService = new ProductService();
         $result = $productService->exportProductsOpeningQuantity($batch, $totalBatch, $total);
 
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
     public function ajaxProcessExportCustomers() {
@@ -54,7 +66,13 @@ class ImportExportController extends ModuleAdminController
         $customerService = new CustomerService();
         $result = $customerService->exportCustomers($batch, $totalBatch, $total, $updateCount);
 
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
     public function ajaxProcessExportOrders() {
@@ -68,7 +86,13 @@ class ImportExportController extends ModuleAdminController
         $invoiceService = new InvoiceService($this->module);
         $result = $invoiceService->exportOrders($batch, $totalBatch, $total, $updateCount, $date, $overwrite);
 
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 
     public function ajaxProcessExportReceipts() {
@@ -81,6 +105,12 @@ class ImportExportController extends ModuleAdminController
         $receiptService = new ReceiptService($this->module);
         $result = $receiptService->exportReceipts($batch, $totalBatch, $total, $updateCount, $date);
 
-        die(Tools::jsonEncode($result));
+        if(_PS_VERSION_ > '1.8') {
+            //8.0
+            die(json_encode($result));
+        } else {
+            //1.7
+            die(Tools::jsonEncode($result));
+        }
     }
 }
